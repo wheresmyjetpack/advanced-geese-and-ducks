@@ -15,9 +15,10 @@ end
 class Goose < Player
   attr_reader :name, :circle, :position
 
-  def intialize(args)
+  def initialize(args)
     @name = args[:name]
     @circle = args[:circle]
+    @base_speed = 1
   end
 
   public
@@ -27,44 +28,55 @@ class Goose < Player
 
   def tag
     player_at_position.selected
+    run
+  end
+
+  def position
+    @position ||= start_position
   end
 
   private
-  def position
-    if position.nil?
-      @position = start_position
-    else
-      position
-    end
+  def start_position
+    start = circle.position_of(self)
+    leave_circle
+    start
   end
 
-  def start_position
-    circle.position(self) + 1
+  def leave_circle
+    players_in_circle.delete(self)
+  end
+
+  def run
+    @base_speed += rand(0..2)
   end
 
   def next_player
-    @position += 1
+    unless position + 1 > players_in_circle.size - 1
+      @position += 1
+    else
+      @position = 0
+    end
   end
 
   def player_at_position
-    circle.players[position]
+    players_in_circle[position]
+  end
+
+  def players_in_circle
+    circle.players
   end
 end
 
 
 class GameCircle
-  attr_reader :players
+  attr_accessor :players
 
-  def initialize(args)
-    @players = args[:players]
-  end
-
-  def remove(player)
+  def vacate(player)
     players.map! { |p| p.eq?(player) ? nil : p }    
     player
   end
   
-  def position(player)
+  def position_of(player)
     players.index(player)
   end
 end
