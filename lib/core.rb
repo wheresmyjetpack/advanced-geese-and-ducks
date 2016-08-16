@@ -1,7 +1,10 @@
-class Duck
+class Player
   attr_reader :name
   attr_accessor :position
+end
 
+
+class Duck < Player
   def initialize(args)
     @name = args[:name]
     @base_speed = 3
@@ -13,10 +16,7 @@ class Duck
 end
 
 
-class Goose
-  attr_reader :name
-  attr_accessor :position
-
+class Goose < Player
   def initialize(args)
     @name = args[:name]
     @base_speed = 3
@@ -28,10 +28,7 @@ class Goose
 end
 
 
-class Dog
-  attr_reader :name
-  attr_accessor :position
-
+class Dog < Player
   def initialize(args)
     @name = args[:name]
     @base_speed = 4
