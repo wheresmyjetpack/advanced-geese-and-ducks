@@ -17,11 +17,11 @@ def starting_position(player, circle)
 end
 
 circle = [
-    Duck.new(name: "Paul"), 
-    Duck.new(name: "Mattie"), 
-    Duck.new(name: "Shane"), 
-    Duck.new(name: "Justin"), 
-    Duck.new(name: "Jordy")
+    Dog.new(name: "Paul"), 
+    Dog.new(name: "Mattie"), 
+    Dog.new(name: "Shane"), 
+    Dog.new(name: "Justin"), 
+    Dog.new(name: "Jordy")
 ]
 
 circle.each { |p| p.position = circle.find_index(p) }
@@ -57,10 +57,17 @@ while game_on
       puts "Goose!"
       puts
       chaser = circle[runner.position]
-      if chaser.chase >= runner.run
+
+      if chaser.distracted?
+        puts chaser.distracted
+        puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
+        circle << selected_player
+        selected_player = chaser
+        runner = nil
+        break
+      elsif chaser.chase >= runner.run
         puts "#{chaser.name} caught #{runner.name}!"
         puts "#{runner.name} is still the runner, starting a new round"
-        puts
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
         circle << selected_player
@@ -68,6 +75,7 @@ while game_on
         runner = nil
         break
       end
+      puts
     when "q"
       game_on = false
       break
