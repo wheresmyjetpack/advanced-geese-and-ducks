@@ -18,7 +18,7 @@ end
 
 circle = [
     Dog.new(name: "Paul"), 
-    Dog.new(name: "Mattie"), 
+    Cat.new(name: "Mattie"), 
     Dog.new(name: "Shane"), 
     Dog.new(name: "Justin"), 
     Dog.new(name: "Jordy")
@@ -39,10 +39,10 @@ while game_on
   puts 
 
   loop do
+    puts "Standing next to #{circle[runner.position].name}"
     keypress = STDIN.getch
     puts "Duck..." if keypress == "\n"
 
-    puts "Standing next to #{circle[runner.position].name}"
 
     case keypress
     when " "

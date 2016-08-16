@@ -7,7 +7,7 @@ end
 class Duck < Chaser
   def initialize(args)
     @name = args[:name]
-    @base_speed = 3
+    @base_speed = 2
   end
 
   def chase
@@ -19,7 +19,7 @@ end
 class Dog < Chaser
   def initialize(args)
     @name = args[:name]
-    @base_speed = 4
+    @base_speed = 3
   end
 
   def chase
@@ -48,6 +48,10 @@ class Cat < Chaser
 
   def distracted?
     [true, false].sample
+  end
+
+  def distracted
+    "MEOW! #{self.name} got distracted by a ball of yarn!"
   end
 end
 
