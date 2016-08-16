@@ -2,27 +2,32 @@
 
 require 'io/console'
 require_relative 'lib/core'
+require_relative 'lib/helpers'
 
-def runner_factory(player, type)
-  type.new(name: player.name)
+player_classes = {
+    1 => Duck,
+    2 => Dog,
+    3 => Cat
+}
+
+puts "How many players?"
+num_players = gets.to_i
+circle = Array.new
+
+num_players.times do
+  puts "Player Name:"
+  name = gets.chomp
+  puts "Select a player class from the list below by entering the corresponding number:"
+  puts
+  puts [
+    "1) Duck",
+    "2) Dog",
+    "3) Cat"
+  ].join("\n") + "\n"
+  class_num = gets.to_i
+  circle << player_factory(name, player_classes[class_num]) 
+  puts
 end
-
-def starting_position(player, circle)
-  index = circle.find_index(player)
-  raise IndexError if index.to_i >= circle.length - 1
-  rescue StandardError
-    index = circle.length - 2
-  else
-    index
-end
-
-circle = [
-    Dog.new(name: "Paul"), 
-    Cat.new(name: "Mattie"), 
-    Dog.new(name: "Shane"), 
-    Dog.new(name: "Justin"), 
-    Dog.new(name: "Jordy")
-]
 
 circle.each { |p| p.position = circle.find_index(p) }
 
@@ -39,14 +44,16 @@ while game_on
   puts 
 
   loop do
-    puts "Standing next to #{circle[runner.position].name}"
+    next_to = circle[runner.position]
+    player_type = next_to.class
+    puts "Standing next to #{next_to.name}"
     keypress = STDIN.getch
-    puts "Duck..." if keypress == "\n"
+    #puts "#{player_type.to_s}..." if keypress == "\n"
 
 
     case keypress
     when " "
-      puts "Duck..."
+      puts "#{player_type.to_s}..."
       unless runner.position >= circle.length - 1
         runner.position += 1
       else 
