@@ -12,18 +12,15 @@ player_classes = {
 
 puts "How many players?"
 num_players = gets.to_i
+puts
 circle = Array.new
 
 num_players.times do
   puts "Player Name:"
   name = gets.chomp
-  puts "Select a player class from the list below by entering the corresponding number:"
   puts
-  puts [
-    "1) Duck",
-    "2) Dog",
-    "3) Cat"
-  ].join("\n") + "\n"
+  puts "Select a player class from the list below by entering the corresponding number:\n"
+  puts player_classes.map { |x| x * ") " }.join("\n") + "\n\n"
   class_num = gets.to_i
   circle << player_factory(name, player_classes[class_num]) 
   puts
