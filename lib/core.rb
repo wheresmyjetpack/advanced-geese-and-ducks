@@ -37,11 +37,18 @@ end
 
 
 class Dog < Chaser
+  attr_reader :breed
+
   def post_initialize(args)
+    @breed = args[:breed] || default_breed
     @toys = 0
   end
 
   public
+  def name
+    "#{@name} the #{breed}"
+  end
+
   def chase
     determine_speed
   end
@@ -54,12 +61,12 @@ class Dog < Chaser
     if found_toy?
       add_toy
       unless max_toys?
-        "#{self.name}'s attention was drawn by something squeaky... found a chew toy!"
+        "#{name}'s attention was drawn by something squeaky... found a chew toy!"
       else
-        "#{self.name} found a third chew toy... they seem excited for the next round."
+        "#{name} found a third chew toy... they seem excited for the next round."
       end
     else
-      "WOOF WOOF! #{self.name} chased after a squirrel instead!"
+      "WOOF WOOF! #{name} chased after a squirrel instead!"
     end
   end
 
@@ -86,7 +93,11 @@ class Dog < Chaser
   end
 
   def found_toy?
-    [true, false, false, false].sample
+    [true, true, false, false, false].sample
+  end
+
+  def default_breed
+    %w{corgi greyhound pitbull}.sample
   end
 end
 
