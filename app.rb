@@ -4,11 +4,8 @@ require 'io/console'
 require_relative 'lib/core'
 require_relative 'lib/helpers'
 
-player_classes = {
-    1 => Duck,
-    2 => Dog,
-    3 => Cat
-}
+player_classes = [Duck, Dog, Cat]
+class_hash = Hash[(1...player_classes.size + 1).zip player_classes]
 
 puts "How many players?"
 num_players = gets.to_i
@@ -20,9 +17,9 @@ num_players.times do
   name = gets.chomp
   puts
   puts "Select a player class from the list below by entering the corresponding number:\n"
-  puts player_classes.map { |x| x * ") " }.join("\n") + "\n\n"
+  puts class_hash.map { |x| x * ") " }.join("\n") + "\n\n"
   class_num = gets.to_i
-  circle << player_factory(name, player_classes[class_num]) 
+  circle << player_factory(name, class_hash[class_num]) 
   puts
 end
 
@@ -45,8 +42,6 @@ while game_on
     player_type = next_to.class
     puts "Standing next to #{next_to.name}"
     keypress = STDIN.getch
-    #puts "#{player_type.to_s}..." if keypress == "\n"
-
 
     case keypress
     when " "
