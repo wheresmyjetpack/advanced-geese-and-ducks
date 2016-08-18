@@ -45,7 +45,7 @@ while game_on
 
     case keypress
     when " "
-      puts "#{player_type.to_s}..."
+      puts "#{player_type}..."
       unless runner.position >= circle.length - 1
         runner.position += 1
       else 

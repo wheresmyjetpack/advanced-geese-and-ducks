@@ -16,7 +16,15 @@ class Chaser
     false
   end
 
+  def chase
+    determine_speed
+  end
+
   private
+  def determine_speed
+    raise NotImplementedError
+  end
+
   def base_speed
     1
   end
@@ -24,12 +32,11 @@ end
 
 
 class Duck < Chaser
-  public
-  def chase
+  private
+  def determine_speed
     base_speed + rand(-1..5)
   end
 
-  private
   def base_speed
     2
   end
@@ -47,10 +54,6 @@ class Dog < Chaser
   public
   def name
     "#{@name} the #{breed}"
-  end
-
-  def chase
-    determine_speed
   end
 
   def distracted?
@@ -104,10 +107,6 @@ end
 
 class Cat < Chaser
   public
-  def chase
-    base_speed * rand(1..3)
-  end
-
   def distracted?
     [true, false].sample
   end
@@ -117,6 +116,10 @@ class Cat < Chaser
   end
 
   private
+  def determine_speed
+    base_speed * rand(1..3)
+  end
+
   def base_speed
     3
   end
