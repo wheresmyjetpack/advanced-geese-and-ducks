@@ -26,7 +26,7 @@ end
 circle.each { |p| p.position = circle.find_index(p) }
 
 # get a random player to be the first runner
-selected_player = circle.sample
+selected_player = circle.sample   # this also will hold the Chaser object while that player is the runner
 game_on = true
 
 while game_on
@@ -64,7 +64,7 @@ while game_on
         selected_player = chaser
         runner = nil
         break
-      elsif chaser.chase >= runner.run
+      elsif chaser.catches?(runner)
         puts "#{chaser.name} caught #{runner.name}!"
         puts "#{runner.name} is still the runner, starting a new round"
       else

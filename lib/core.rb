@@ -16,8 +16,8 @@ class Chaser
     false
   end
 
-  def chase
-    determine_speed
+  def catches?(runner)
+    determine_speed >= runner.run
   end
 
   private
