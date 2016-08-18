@@ -117,7 +117,7 @@ class Cat < Chaser
 
   private
   def determine_speed
-    base_speed * rand(1..3)
+    (base_speed * rand(1..3)) + 1
   end
 
   def base_speed
