@@ -1,9 +1,10 @@
 class Chaser
-  attr_reader :name
+  attr_reader :name, :breed
   attr_accessor :position
 
   def initialize(args)
     @name = args[:name]
+    @breed = args[:breed] || default_breed
     post_initialize(args)
   end
 
@@ -12,6 +13,10 @@ class Chaser
   end
 
   public
+  def name
+    "#{@name} the #{breed}"
+  end
+
   def distracted?
     false
   end
@@ -22,11 +27,15 @@ class Chaser
 
   private
   def determine_speed
-    raise NotImplementedError
+    base_speed
   end
 
   def base_speed
     1
+  end
+
+  def default_breed
+    raise NotImplementedError
   end
 end
 
@@ -40,22 +49,19 @@ class Duck < Chaser
   def base_speed
     2
   end
+
+  def default_breed
+    ["mallard", "hook bill", "Welsh harlequin"].sample
+  end
 end
 
 
 class Dog < Chaser
-  attr_reader :breed
-
   def post_initialize(args)
-    @breed = args[:breed] || default_breed
     @toys = 0
   end
 
   public
-  def name
-    "#{@name} the #{breed}"
-  end
-
   def distracted?
     [true, false, false].sample
   end
@@ -122,6 +128,10 @@ class Cat < Chaser
 
   def base_speed
     3
+  end
+
+  def default_breed
+    ["Siamese", "American shorthair", "tabby"].sample
   end
 end
 
