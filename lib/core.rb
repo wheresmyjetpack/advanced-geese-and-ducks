@@ -112,22 +112,52 @@ end
 
 
 class Cat < Chaser
+  def post_initialize(args)
+    @catnip = false
+  end
+
   public
   def distracted?
-    [true, false].sample
+    unless @catnip
+      [true, false].sample
+    else
+      false
+    end
   end
 
   def distracted
-    "MEOW! #{self.name} got distracted by a ball of yarn!"
+    if found_catnip?
+      add_catnip
+      "#{self.name} found some catnip, they seem really excited for the next round!"
+    else
+      "MEOW! #{self.name} got distracted by a ball of yarn!"
+    end
   end
 
   private
   def determine_speed
-    (base_speed * rand(1..3)) + 1
+    unless @catnip
+      (base_speed * rand(1..3)) + 1
+    else
+      use_catnip
+      (( base_speed + 1 ) * rand(1..3)) + 1
+    end
   end
 
   def base_speed
     3
+  end
+
+  def found_catnip?
+    [true, false, false].sample
+  end
+
+  def add_catnip
+    @catnip = true
+  end
+
+  def use_catnip
+    @catnip = false
   end
 
   def default_breed
