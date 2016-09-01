@@ -140,7 +140,6 @@ class Cat < Chaser
       (base_speed * rand(1..3)) + 1
     else
       use_catnip
-      (( base_speed + 1 ) * rand(1..3)) + 1
     end
   end
 
@@ -158,6 +157,7 @@ class Cat < Chaser
 
   def use_catnip
     @catnip = false
+    (( base_speed + 1 ) * rand(1..3)) + 1
   end
 
   def default_breed
