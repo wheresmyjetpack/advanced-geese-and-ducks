@@ -7,19 +7,12 @@ require_relative 'lib/helpers'
 player_classes = [Duck, Dog, Cat]
 obtainable_types = [Bicycle, Skateboard, Rollerblades]
 class_hash = Hash[ (1...player_classes.size + 1).zip player_classes ]
-obtainables = Array.new
-garage = Garage.new
-
-obtainable_types.each do |type|
-  obtainables << type.new(garage: garage)
-end
-
-obtainables_hash = Hash[ (1...obtainables.size + 1).zip obtainables ]
 
 puts "How many players?"
 num_players = gets.to_i
 puts
 circle = Array.new
+player_garages = Hash.new
 
 num_players.times do
   puts "Player Name:"
@@ -28,7 +21,19 @@ num_players.times do
   puts "Select a player class from the list below by entering the corresponding number:\n"
   puts class_hash.map { |x| x * ") " }.join("\n") + "\n\n"
   class_num = gets.to_i
-  circle << player_factory(name, class_hash[class_num]) 
+  player = player_factory(name, class_hash[class_num]) 
+  circle << player
+
+  obtainables = Array.new
+  garage = Garage.new
+
+  obtainable_types.each do |type|
+    obtainables << type.new(garage: garage)
+  end
+
+  obtainables_hash = Hash[ (1...obtainables.size + 1).zip obtainables ]
+
+  player_garages[player.name] = obtainables_hash
   puts
 end
 
@@ -49,7 +54,6 @@ while game_on
 
   loop do
     puts "Round: #{current_round}"
-    selected_player.repair_if_broken(current_round)
     next_to = circle[runner.position]
     player_type = next_to.class
     puts "Standing next to #{next_to.name}"
@@ -71,10 +75,11 @@ while game_on
 
       if chaser.catches?(runner)
         puts "#{chaser.name} caught #{runner.name}!"
-        puts "#{runner.name} is still the runner, starting a new round"
-        current_round += 1
+        chaser.repair_if_broken(current_round)
+        puts "#{runner.name} is still the runner"
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
+        chaser.repair_if_broken(current_round)
         circle << selected_player
         selected_player.score
         puts "#{selected_player.name}'s points: #{selected_player.points}"
@@ -82,13 +87,17 @@ while game_on
           puts "#{selected_player.name} gained enough points to acquire an item!"
           puts "Select an item from the menu:"
           puts
-          puts obtainables_hash.map { |k, v| "#{k}) #{v.name}" }.join("\n") + "\n\n"
-          obtainable = obtainables_hash[gets.to_i]
+          puts player_garages[selected_player.name].map { |k, v| "#{k}) #{v.name}" }.join("\n") + "\n\n"
+          obtainable = player_garages[selected_player.name][gets.to_i]
           puts "Selected the #{obtainable.name}"
           selected_player.obtain(obtainable, current_round)
         end
         selected_player = chaser
         runner = nil
+        puts "Starting a new round"
+        current_round += 1
+        puts "=" * 16
+        puts
         break
       end
       puts
