@@ -187,41 +187,71 @@ end
 
 
 class Bicycle
+  attr_reader :repair_time, :garage
+
+  def initialize(args)
+    @repair_time = 3
+    @garage = args[:garage]
+  end
+
   def speed
-    3
+    rand(1..6)
+  end
+
+  def obtainable?(current_turn)
+    !being_repaired?(current_turn)
+  end
+
+  def being_repaired?(current_turn)
+    garage.repairing?(self, current_turn)
   end
 end
 
 
 class Skateboard
+  attr_reader :repair_time
+
+  def initialize(args)
+    @repair_time = 2
+  end
+
+  def speed
+    rand(2..4)
+  end
+end
+
+
+class Rollerblades
+  attr_reader :repair_time
+
+  def initialize(args)
+    @repair_time = 1
+  end
+
   def speed
     2
   end
 end
 
 
-class Rollerblades
-  def speed
-    1
-  end
-end
+class Garage
+  attr_reader :repair_shop
 
-
-class VehicleShop
-  def obtainable?(target, start, current_turn)
-    if target.class == Bicycle
-      repair_time = 3
-    elsif target.class == Skateboard
-      repair_time = 2
-    elsif target.class == Rollerblades
-      repair_time = 1
-    end
-    !being_repaired?(target, start, current_turn, repair_time)
+  def initialize(args)
+    @repair_shop = {}
   end
 
-  def being_repaired?(target, start, current_turn, repair_time)
-    if start + repair_time < current_turn
-      true
-    end
+  public
+  def repair(obtainable, turn)
+    repair_shop[obtainable.to_s] = turn
+  end
+
+  def repairing?(obtainable, current_turn)
+    started_repairing(obtainable) + obtainable.repair_time < current_turn
+  end
+
+  private
+  def started_repairing(obtainable)
+    repair_shop[obtainable.to_s]
   end
 end
