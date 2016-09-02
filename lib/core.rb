@@ -8,6 +8,7 @@ class Chaser
     @name = args[:name]
     @breed = args[:breed] || default_breed
     @points = 0
+    @obtainable = nil
     post_initialize(args)
   end
 
@@ -25,11 +26,15 @@ class Chaser
   end
 
   def catches?(runner)
-    determine_speed >= runner.run
+    distracted? ? distracted : determine_speed >= runner.run
   end
 
   def score
     @points += 1
+  end
+
+  def obtain(obtainable)
+    @obtainable = obtainable
   end
 
   private
@@ -42,6 +47,10 @@ class Chaser
   end
 
   def default_breed
+    raise NotImplementedError
+  end
+
+  def distracted
     raise NotImplementedError
   end
 end
@@ -77,12 +86,12 @@ class Dog < Chaser
     if found_toy?
       add_toy
       unless max_toys?
-        "#{name}'s attention was drawn by something squeaky... found a chew toy!"
+        puts "#{name}'s attention was drawn by something squeaky... found a chew toy!"
       else
-        "#{name} found a third chew toy... they seem excited for the next round."
+        puts "#{name} found a third chew toy... they seem excited for the next round."
       end
     else
-      "WOOF WOOF! #{name} chased after a squirrel instead!"
+      puts "WOOF WOOF! #{name} chased after a squirrel instead!"
     end
   end
 
@@ -135,23 +144,26 @@ class Cat < Chaser
   def distracted
     if found_catnip?
       add_catnip
-      "#{self.name} found some catnip, they seem really excited for the next round!"
+      puts "#{self.name} found some catnip, they seem really excited for the next round!"
     else
-      "MEOW! #{self.name} got distracted by a ball of yarn!"
+      puts "MEOW! #{self.name} got distracted by a ball of yarn!"
     end
   end
 
   private
   def determine_speed
-    unless @catnip
-      (base_speed * rand(1..3)) + 1
-    else
-      use_catnip
-    end
+    (base_speed * rand(1..3)) + 1 + bonus_speed
   end
 
   def base_speed
     3
+  end
+  
+  def bonus_speed
+    bonus = 0
+    bonus += obtainable_speed
+    bonus += use_catnip if @catnip
+    bonus
   end
 
   def found_catnip?
@@ -164,7 +176,11 @@ class Cat < Chaser
 
   def use_catnip
     @catnip = false
-    (( base_speed + 1 ) * rand(1..3)) + 1
+    1 + rand(1..3)
+  end
+
+  def obtainable_speed
+    @obtainable ? @obtainable.speed : 0
   end
 
   def default_breed

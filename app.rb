@@ -10,8 +10,8 @@ class_hash = Hash[ (1...player_classes.size + 1).zip player_classes ]
 obtainables = Array.new
 garage = Garage.new
 
-obtainable_types.each do |obt|
-  obtainables << obt.new(garage: garage)
+obtainable_types.each do |type|
+  obtainables << type.new(garage: garage)
 end
 
 obtainables_hash = Hash[ (1...obtainables.size + 1).zip obtainables ]
@@ -66,20 +66,7 @@ while game_on
       puts
       chaser = circle[runner.position]
 
-      if chaser.distracted?
-        puts chaser.distracted
-        puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
-        circle << selected_player
-        selected_player.score
-        puts "#{selected_player.name}'s points: #{selected_player.points}"
-        if selected_player.points == 3
-          puts "#{selected_player.name} gained enough points to acquire a item!"
-          puts "Select an item from the menu:"
-        end
-        selected_player = chaser
-        runner = nil
-        break
-      elsif chaser.catches?(runner)
+      if chaser.catches?(runner)
         puts "#{chaser.name} caught #{runner.name}!"
         puts "#{runner.name} is still the runner, starting a new round"
       else
@@ -88,8 +75,13 @@ while game_on
         selected_player.score
         puts "#{selected_player.name}'s points: #{selected_player.points}"
         if selected_player.points == 3
-          puts "#{selected_player.name} gained enough points to acquire a item!"
+          puts "#{selected_player.name} gained enough points to acquire an item!"
           puts "Select an item from the menu:"
+          puts
+          puts obtainables_hash.map { |k, v| "#{k}) #{v.name}" }.join("\n") + "\n\n"
+          obtainable = obtainables_hash[gets.to_i]
+          puts "Selected the #{obtainable.name}"
+          selected_player.obtain(obtainable)
         end
         selected_player = chaser
         runner = nil
