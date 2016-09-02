@@ -33,10 +33,6 @@ class Chaser
     @points += 1
   end
 
-  def obtain(obtainable)
-    @obtainable = obtainable
-  end
-
   private
   def determine_speed
     base_speed
@@ -134,11 +130,7 @@ class Cat < Chaser
 
   public
   def distracted?
-    unless @catnip
-      [true, false].sample
-    else
-      false
-    end
+    @catnip ? false : [true, false].sample
   end
 
   def distracted
@@ -147,6 +139,22 @@ class Cat < Chaser
       puts "#{self.name} found some catnip, they seem really excited for the next round!"
     else
       puts "MEOW! #{self.name} got distracted by a ball of yarn!"
+    end
+  end
+
+  def repair_if_broken(current_round)
+    if broken_item?
+      puts "The #{@obtainable.name} broke! Sending it to the garage for repairs"
+      repair_item(current_round)
+      @obtainable = nil
+    end
+  end
+
+  def obtain(item, current_round)
+    if item.obtainable?(current_round)
+      @obtainable = item
+    else
+      puts "That item is unavailable right now!"
     end
   end
 
@@ -181,6 +189,14 @@ class Cat < Chaser
 
   def obtainable_speed
     @obtainable ? @obtainable.speed : 0
+  end
+
+  def broken_item?
+    @obtainable ? @obtainable.breaks? : false
+  end
+
+  def repair_item(current_round)
+    @obtainable.repair(current_round)
   end
 
   def default_breed
@@ -219,6 +235,14 @@ class Bicycle
   def repair_time
     3
   end
+
+  def breaks?
+    [true, true, false].sample
+  end
+
+  def repair(current_round)
+    garage.repair(self, current_round)
+  end
 end
 
 
@@ -231,6 +255,10 @@ class Skateboard
 
   def repair_time
     2
+  end
+
+  def breaks?
+    [true, false, false].sample
   end
 end
 
@@ -245,6 +273,10 @@ class Rollerblades
   def repair_time
     1
   end
+
+  def breaks?
+    [true, false, false, false].sample
+  end
 end
 
 
@@ -256,12 +288,13 @@ class Garage
   end
 
   public
-  def repair(obtainable, turn)
-    repair_shop[obtainable.to_s] = turn
+  def repair(obtainable, round)
+    repair_shop[obtainable.to_s] = round
+    puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + round + 1}"
   end
 
-  def repairing?(obtainable, current_turn)
-    (started_repairing(obtainable) + obtainable.repair_time) > current_turn
+  def repairing?(obtainable, current_round)
+    (started_repairing(obtainable) + obtainable.repair_time) > current_round
   end
 
   private

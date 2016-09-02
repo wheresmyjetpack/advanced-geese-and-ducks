@@ -37,6 +37,7 @@ circle.each { |p| p.position = circle.find_index(p) }
 # get a random player to be the first runner
 selected_player = circle.sample   # this also will hold the Chaser object while that player is the runner
 game_on = true
+current_round = 1
 
 while game_on
   puts "#{selected_player.name} is the runner"
@@ -47,6 +48,8 @@ while game_on
   puts 
 
   loop do
+    puts "Round: #{current_round}"
+    selected_player.repair_if_broken(current_round)
     next_to = circle[runner.position]
     player_type = next_to.class
     puts "Standing next to #{next_to.name}"
@@ -69,19 +72,20 @@ while game_on
       if chaser.catches?(runner)
         puts "#{chaser.name} caught #{runner.name}!"
         puts "#{runner.name} is still the runner, starting a new round"
+        current_round += 1
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
         circle << selected_player
         selected_player.score
         puts "#{selected_player.name}'s points: #{selected_player.points}"
-        if selected_player.points == 3
+        if selected_player.points % 3 == 0
           puts "#{selected_player.name} gained enough points to acquire an item!"
           puts "Select an item from the menu:"
           puts
           puts obtainables_hash.map { |k, v| "#{k}) #{v.name}" }.join("\n") + "\n\n"
           obtainable = obtainables_hash[gets.to_i]
           puts "Selected the #{obtainable.name}"
-          selected_player.obtain(obtainable)
+          selected_player.obtain(obtainable, current_round)
         end
         selected_player = chaser
         runner = nil
