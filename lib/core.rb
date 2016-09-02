@@ -33,6 +33,22 @@ class Chaser
     @points += 1
   end
 
+  def obtain(item, current_round)
+    if item.obtainable?(current_round)
+      @obtainable = item
+    else
+      puts "That item is unavailable right now!"
+    end
+  end
+
+  def repair_if_broken(current_round)
+    if broken_item?
+      puts "The #{@obtainable.name} broke! Sending it to the garage for repairs"
+      repair_item(current_round)
+      @obtainable = nil
+    end
+  end
+
   private
   def determine_speed
     base_speed
@@ -40,6 +56,18 @@ class Chaser
 
   def base_speed
     1
+  end
+
+  def obtainable_speed
+    @obtainable ? @obtainable.speed : 0
+  end
+
+  def broken_item?
+    @obtainable ? @obtainable.breaks? : false
+  end
+
+  def repair_item(current_round)
+    @obtainable.repair(current_round)
   end
 
   def default_breed
@@ -60,6 +88,12 @@ class Duck < Chaser
 
   def base_speed
     2
+  end
+
+  def bonus_speed
+    bonus = 0
+    bonus += obtainable_speed
+    bonus
   end
 
   def default_breed
@@ -105,12 +139,17 @@ class Dog < Chaser
   end
 
   def determine_speed
-    unless max_toys?
-      base_speed + rand(0..2)
-    else
+    base_speed + rand(0..2) + bonus_speed
+  end
+
+  def bonus_speed
+    bonus = 0
+    if max_toys?
+      bonus += rand(1..2)
       @toys = 0
-      base_speed + rand(1..3)
     end
+    bonus += obtainable_speed
+    bonus
   end
 
   def found_toy?
@@ -142,22 +181,6 @@ class Cat < Chaser
     end
   end
 
-  def repair_if_broken(current_round)
-    if broken_item?
-      puts "The #{@obtainable.name} broke! Sending it to the garage for repairs"
-      repair_item(current_round)
-      @obtainable = nil
-    end
-  end
-
-  def obtain(item, current_round)
-    if item.obtainable?(current_round)
-      @obtainable = item
-    else
-      puts "That item is unavailable right now!"
-    end
-  end
-
   private
   def determine_speed
     (base_speed * rand(1..3)) + 1 + bonus_speed
@@ -185,18 +208,6 @@ class Cat < Chaser
   def use_catnip
     @catnip = false
     1 + rand(1..3)
-  end
-
-  def obtainable_speed
-    @obtainable ? @obtainable.speed : 0
-  end
-
-  def broken_item?
-    @obtainable ? @obtainable.breaks? : false
-  end
-
-  def repair_item(current_round)
-    @obtainable.repair(current_round)
   end
 
   def default_breed
@@ -233,7 +244,7 @@ class Bicycle
   end
 
   def repair_time
-    3
+    5
   end
 
   def breaks?
@@ -294,7 +305,7 @@ class Garage
   end
 
   def repairing?(obtainable, current_round)
-    (started_repairing(obtainable) + obtainable.repair_time) > current_round
+    (started_repairing(obtainable) + obtainable.repair_time) >= current_round
   end
 
   private
