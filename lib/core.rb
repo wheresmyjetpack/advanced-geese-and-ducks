@@ -184,3 +184,44 @@ class Goose
     3
   end
 end
+
+
+class Bicycle
+  def speed
+    3
+  end
+end
+
+
+class Skateboard
+  def speed
+    2
+  end
+end
+
+
+class Rollerblades
+  def speed
+    1
+  end
+end
+
+
+class VehicleShop
+  def obtainable?(target, start, current_turn)
+    if target.class == Bicycle
+      repair_time = 3
+    elsif target.class == Skateboard
+      repair_time = 2
+    elsif target.class == Rollerblades
+      repair_time = 1
+    end
+    !being_repaired?(target, start, current_turn, repair_time)
+  end
+
+  def being_repaired?(target, start, current_turn, repair_time)
+    if start + repair_time < current_turn
+      true
+    end
+  end
+end
