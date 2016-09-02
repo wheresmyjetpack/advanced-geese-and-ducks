@@ -5,7 +5,16 @@ require_relative 'lib/core'
 require_relative 'lib/helpers'
 
 player_classes = [Duck, Dog, Cat]
-class_hash = Hash[(1...player_classes.size + 1).zip player_classes]
+obtainable_types = [Bicycle, Skateboard, Rollerblades]
+class_hash = Hash[ (1...player_classes.size + 1).zip player_classes ]
+obtainables = Array.new
+garage = Garage.new
+
+obtainable_types.each do |obt|
+  obtainables << obt.new(garage: garage)
+end
+
+obtainables_hash = Hash[ (1...obtainables.size + 1).zip obtainables ]
 
 puts "How many players?"
 num_players = gets.to_i
@@ -61,6 +70,12 @@ while game_on
         puts chaser.distracted
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
         circle << selected_player
+        selected_player.score
+        puts "#{selected_player.name}'s points: #{selected_player.points}"
+        if selected_player.points == 3
+          puts "#{selected_player.name} gained enough points to acquire a item!"
+          puts "Select an item from the menu:"
+        end
         selected_player = chaser
         runner = nil
         break
@@ -70,6 +85,12 @@ while game_on
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
         circle << selected_player
+        selected_player.score
+        puts "#{selected_player.name}'s points: #{selected_player.points}"
+        if selected_player.points == 3
+          puts "#{selected_player.name} gained enough points to acquire a item!"
+          puts "Select an item from the menu:"
+        end
         selected_player = chaser
         runner = nil
         break

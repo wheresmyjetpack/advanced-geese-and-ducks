@@ -1,10 +1,13 @@
+require_relative 'roles'
+
 class Chaser
-  attr_reader :name, :breed
+  attr_reader :name, :breed, :points
   attr_accessor :position
 
   def initialize(args)
     @name = args[:name]
     @breed = args[:breed] || default_breed
+    @points = 0
     post_initialize(args)
   end
 
@@ -23,6 +26,10 @@ class Chaser
 
   def catches?(runner)
     determine_speed >= runner.run
+  end
+
+  def score
+    @points += 1
   end
 
   private
@@ -187,49 +194,40 @@ end
 
 
 class Bicycle
-  attr_reader :repair_time, :garage
-
-  def initialize(args)
-    @repair_time = 3
-    @garage = args[:garage]
-  end
+  include Obtainable
 
   def speed
     rand(1..6)
   end
 
-  def obtainable?(current_turn)
-    !being_repaired?(current_turn)
-  end
-
-  def being_repaired?(current_turn)
-    garage.repairing?(self, current_turn)
+  def repair_time
+    3
   end
 end
 
 
 class Skateboard
-  attr_reader :repair_time
-
-  def initialize(args)
-    @repair_time = 2
-  end
+  include Obtainable
 
   def speed
     rand(2..4)
+  end
+
+  def repair_time
+    2
   end
 end
 
 
 class Rollerblades
-  attr_reader :repair_time
-
-  def initialize(args)
-    @repair_time = 1
-  end
+  include Obtainable
 
   def speed
     2
+  end
+
+  def repair_time
+    1
   end
 end
 
@@ -237,7 +235,7 @@ end
 class Garage
   attr_reader :repair_shop
 
-  def initialize(args)
+  def initialize
     @repair_shop = {}
   end
 
@@ -247,11 +245,11 @@ class Garage
   end
 
   def repairing?(obtainable, current_turn)
-    started_repairing(obtainable) + obtainable.repair_time < current_turn
+    (started_repairing(obtainable) + obtainable.repair_time) > current_turn
   end
 
   private
   def started_repairing(obtainable)
-    repair_shop[obtainable.to_s]
+    repair_shop[obtainable.to_s] || 0 - obtainable.repair_time
   end
 end
