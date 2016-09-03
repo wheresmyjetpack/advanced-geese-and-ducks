@@ -38,12 +38,13 @@ class Chaser
       @obtainable = item
     else
       puts "That item is unavailable right now!"
+      puts
     end
   end
 
   def repair_if_broken(current_round)
     if broken_item?
-      puts "The #{@obtainable.name} broke! Sending it to the garage for repairs"
+      puts "#{name}'s #{@obtainable.name} broke! Sending it to the garage for repairs"
       repair_item(current_round)
       @obtainable = nil
     end
@@ -56,6 +57,12 @@ class Chaser
 
   def base_speed
     1
+  end
+
+  def bonus_speed
+    bonus = 0
+    bonus += obtainable_speed
+    bonus
   end
 
   def obtainable_speed
@@ -88,12 +95,6 @@ class Duck < Chaser
 
   def base_speed
     2
-  end
-
-  def bonus_speed
-    bonus = 0
-    bonus += obtainable_speed
-    bonus
   end
 
   def default_breed
@@ -250,10 +251,6 @@ class Bicycle
   def breaks?
     [true, true, false].sample
   end
-
-  def repair(current_round)
-    garage.repair(self, current_round)
-  end
 end
 
 
@@ -265,7 +262,7 @@ class Skateboard
   end
 
   def repair_time
-    2
+    4
   end
 
   def breaks?
@@ -282,11 +279,11 @@ class Rollerblades
   end
 
   def repair_time
-    1
+    3
   end
 
   def breaks?
-    [true, false, false, false].sample
+    [true, false, false, false, false].sample
   end
 end
 
