@@ -17,6 +17,10 @@ module Obtainable
     0
   end
 
+  def repair(current_round)
+    garage.repair(self, current_round)
+  end
+
   def name
     self.class.to_s
   end
