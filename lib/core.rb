@@ -52,7 +52,7 @@ class Chaser
 
   private
   def determine_speed
-    base_speed
+    base_speed + bonus_speed
   end
 
   def base_speed
@@ -90,7 +90,7 @@ end
 class Duck < Chaser
   private
   def determine_speed
-    base_speed + rand(-1..5)
+    base_speed + rand(-1..5) + bonus_speed
   end
 
   def base_speed
@@ -116,11 +116,6 @@ class Dog < Chaser
   def distracted
     if found_toy?
       add_toy
-      unless max_toys?
-        puts "#{name}'s attention was drawn by something squeaky... found a chew toy!"
-      else
-        puts "#{name} found a third chew toy... they seem excited for the next round."
-      end
     else
       puts "WOOF WOOF! #{name} chased after a squirrel instead!"
     end
@@ -129,6 +124,11 @@ class Dog < Chaser
   private
   def add_toy
     @toys += 1
+    unless max_toys?
+      puts "#{name}'s attention was drawn by something squeaky... found a chew toy!"
+    else
+      puts "#{name} found a third chew toy... they seem excited for the next round."
+    end
   end
 
   def base_speed
