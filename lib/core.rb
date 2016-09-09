@@ -1,3 +1,4 @@
+require 'forwardable'
 require_relative 'roles'
 
 class Chaser
@@ -70,7 +71,8 @@ class Chaser
   end
 
   def broken_item?
-    @obtainable ? @obtainable.breaks? : false
+    # check if item is broken, always return false if no item for chaser
+    @obtainable ? @obtainable.broken_parts? : false
   end
 
   def repair_item(current_round)
@@ -239,51 +241,72 @@ end
 
 class Bicycle
   include Obtainable
+  include Breakable
+  attr_reader :parts
+
+  def post_initialize(args)
+    @parts = args[:parts]
+  end
 
   def speed
-    rand(1..6)
+    rand(1..2) + parts_quality
   end
 
   def repair_time
-    5
+    5 * num_broken_parts
   end
 
-  def breaks?
-    [true, true, false].sample
+  private
+  def parts_quality
+    parts.quality
   end
 end
 
 
 class Skateboard
   include Obtainable
+  include Breakable
+  attr_reader :parts
+
+  def post_initialize(args)
+    @parts = args[:parts]
+  end
 
   def speed
-    rand(2..4)
+    1 + parts_quality
   end
 
   def repair_time
-    4
+    4 * num_broken_parts
   end
 
-  def breaks?
-    [true, false, false].sample
+  private
+  def parts_quality
+    parts.quality
   end
 end
 
 
 class Rollerblades
   include Obtainable
+  include Breakable
+  attr_reader :parts
+
+  def post_initialize(args)
+    @parts = args[:parts]
+  end
 
   def speed
-    2
+    parts_quality
   end
 
   def repair_time
-    3
+    3 * num_broken_parts
   end
 
-  def breaks?
-    [true, false, false, false, false].sample
+  private
+  def parts_quality
+    parts.quality
   end
 end
 
@@ -311,3 +334,68 @@ class Garage
     repair_shop[obtainable.to_s] || 0 - obtainable.repair_time
   end
 end
+
+
+class Parts
+  extend Forwardable
+  def_delegators :@parts, :each, :size, :inject
+  include Enumerable
+
+  def initialize(parts)
+    @parts = parts
+  end
+
+  public
+  def quality
+    inject(0) { |sum, part| sum += enhancement_of(part) } 
+  end
+
+  private
+  def enhancement_of(part)
+    part.speed_boost
+  end
+end
+
+
+class Part
+  attr_reader :name, :description, :speed_boost
+
+  def initialize(args)
+    @name = args[:name]
+    @description = args[:description]
+    @speed_boost = args[:speed_boost]
+    @break_chance = args[:break_chance]
+  end
+  
+  public
+  def broken?
+    breaks?
+  end
+
+  private
+  def breaks?
+    broken = rand() <= @break_chance
+    if broken
+      puts "*** The #{description} #{name} broke ***"
+      return broken
+    end
+    broken
+  end
+end
+
+
+module PartsFactory
+  def self.build(config, parts_class=Parts, part_class=Part)
+    parts_class.new(
+      config.collect do |part_config|
+        part_class.new(
+          name: part_config[0],
+          description: part_config[1],
+          speed_boost: part_config[2],
+          break_chance: part_config.fetch(3, 0.0)
+        )
+      end
+    )
+  end
+end
+

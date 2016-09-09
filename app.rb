@@ -5,7 +5,8 @@ require_relative 'lib/core'
 require_relative 'lib/helpers'
 
 player_classes = [Duck, Dog, Cat]
-obtainable_types = [Bicycle, Skateboard, Rollerblades]
+
+
 class_hash = Hash[ (1...player_classes.size + 1).zip player_classes ]
 
 puts "How many players?"
@@ -13,6 +14,32 @@ num_players = gets.to_i
 puts
 circle = Array.new
 player_garages = Hash.new
+
+bicycle_config = [
+  ['tires', '24"', 1, 0.10],
+  ['chain', '6-speed', 1, 0.1],
+  ['gears', '6-speed', 2, 0.09],
+  ['frame', 'road bike', 1, 0.05],
+  ['brakes', 'old and rusted', 0, 0.09]
+]
+
+rollerblades_config = [
+  ['wheels', 'recreational', 1, 0.02],
+  ['boot', 'recreational', 0],
+  ['bearings', 'ABEC rating 5', 1, 0.07]
+]
+
+skateboard_config = [
+  ['deck', 'shortboard', 1, 0.08],
+  ['wheels', 'low-grade', 1, 0.03],
+  ['bearings', 'ABEC rating 5', 1, 0.07]
+]
+
+obtainable_types = {
+  Bicycle => bicycle_config, 
+  Skateboard => skateboard_config,
+  Rollerblades => rollerblades_config
+}
 
 num_players.times do
   puts "Player Name:"
@@ -27,8 +54,11 @@ num_players.times do
   obtainables = Array.new
   garage = Garage.new
 
-  obtainable_types.each do |type|
-    obtainables << type.new(garage: garage)
+  obtainable_types.each do |type, config|
+    obtainables << type.new(
+      garage: garage,
+      parts: PartsFactory.build(config)
+    )
   end
 
   obtainables_hash = Hash[ (1...obtainables.size + 1).zip obtainables ]
