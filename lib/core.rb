@@ -249,11 +249,13 @@ end
 
 class Bicycle
   include Obtainable
-  include Breakable
+  include BreakableParts
   attr_reader :parts
 
-  def post_initialize(args)
+  def initialize(args)
+    @garage = args[:garage]
     @parts = args[:parts]
+    @broken_parts = Array.new
   end
 
   def speed
@@ -273,11 +275,13 @@ end
 
 class Skateboard
   include Obtainable
-  include Breakable
+  include BreakableParts
   attr_reader :parts
 
-  def post_initialize(args)
+  def initialize(args)
+    @garage = args[:garage]
     @parts = args[:parts]
+    @broken_parts = Array.new
   end
 
   def speed
@@ -297,11 +301,13 @@ end
 
 class Rollerblades
   include Obtainable
-  include Breakable
+  include BreakableParts
   attr_reader :parts
 
-  def post_initialize(args)
+  def initialize(args)
+    @garage = args[:garage]
     @parts = args[:parts]
+    @broken_parts = Array.new
   end
 
   def speed
@@ -349,12 +355,14 @@ end
 
 
 class Parts
+  attr_reader :broken_parts
   extend Forwardable
   def_delegators :@parts, :each, :size, :inject
   include Enumerable
 
   def initialize(parts)
     @parts = parts
+    @broken_parts = Array.new
   end
 
   public
@@ -362,9 +370,24 @@ class Parts
     inject(0) { |sum, part| sum += enhancement_of(part) } 
   end
 
+  def fix
+    broken_parts.clear
+  end
+
+  def broken_parts?
+    each do |part|
+      broken_parts << part if broken?(part)
+    end
+    broken_parts.empty? ? false : true
+  end
+
   private
   def enhancement_of(part)
     part.speed_boost
+  end
+
+  def broken?(part)
+    part.broken?
   end
 end
 

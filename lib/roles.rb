@@ -1,13 +1,8 @@
 module Obtainable
   attr_reader :garage
 
-  def initialize(args)
-    @garage = args[:garage]
-    post_initialize(args)
-  end
-
-  def post_initialize
-    nil
+  def garage
+    @garage ||= ::Garage.new
   end
 
   def obtainable?(current_round)
@@ -32,37 +27,30 @@ module Obtainable
 end
 
 
-module Breakable
-  def broken_parts
-    @broken_parts ||= Array.new
+module BreakableParts
+  public
+  def parts
+    @parts ||= ::Parts.new
   end
 
-  def parts
-    # needs to be implemented in the class inheriting Repairable's behavior
-    raise NotImplementedError
+  def broken_parts
+    parts.broken_parts
   end
 
   def repair_time
-    5 * @broken.size
+    num_broken_parts
   end
 
   def fixed
-    broken_parts.clear
+    parts.fix
   end
 
   def broken_parts?
-    parts.each do |part|
-      broken_parts << part if broken?(part)
-    end
-    broken_parts.empty? ? false : true
-  end
-
-  def num_broken_parts
-    broken_parts.size
+    parts.broken_parts?
   end
 
   private
-  def broken?(part)
-    part.broken?
+  def num_broken_parts
+    broken_parts.size
   end
 end
