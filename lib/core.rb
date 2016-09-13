@@ -34,6 +34,10 @@ class Chaser
     @points += 1
   end
 
+  def lose_point
+    @points -= 1
+  end
+
   def obtain(item, current_round)
     if item.obtainable?(current_round)
       @obtainable = item
@@ -72,7 +76,11 @@ class Chaser
 
   def broken_item?
     # check if item is broken, always return false if no item for chaser
-    @obtainable ? @obtainable.broken_parts? : false
+    if @obtainable
+      @obtainable.broken_parts?
+    else
+      false
+    end
   end
 
   def repair_item(current_round)
@@ -326,7 +334,11 @@ class Garage
   end
 
   def repairing?(obtainable, current_round)
-    (started_repairing(obtainable) + obtainable.repair_time) >= current_round
+    still_repairing = (started_repairing(obtainable) + obtainable.repair_time) >= current_round
+    unless still_repairing
+      obtainable.fixed
+    end
+    still_repairing
   end
 
   private

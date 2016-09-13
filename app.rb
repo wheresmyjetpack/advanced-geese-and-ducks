@@ -73,6 +73,7 @@ circle.each { |p| p.position = circle.find_index(p) }
 selected_player = circle.sample   # this also will hold the Chaser object while that player is the runner
 game_on = true
 current_round = 1
+failures = 0
 
 while game_on
   puts "#{selected_player.name} is the runner"
@@ -107,6 +108,12 @@ while game_on
         puts "#{chaser.name} caught #{runner.name}!"
         chaser.repair_if_broken(current_round)
         puts "#{runner.name} is still the runner"
+        failures += 1
+        if failures == 3
+          puts
+          puts "*** #{runner.name} was caught too many times, they lose a point! ***" 
+          selected_player.lose_point
+        end
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
         chaser.repair_if_broken(current_round)
@@ -126,6 +133,7 @@ while game_on
         runner = nil
         puts "Starting a new round"
         current_round += 1
+        failures = 0
         puts "=" * 16
         puts
         break

@@ -46,6 +46,10 @@ module Breakable
     5 * @broken.size
   end
 
+  def fixed
+    broken_parts.clear
+  end
+
   def broken_parts?
     parts.each do |part|
       broken_parts << part if broken?(part)
