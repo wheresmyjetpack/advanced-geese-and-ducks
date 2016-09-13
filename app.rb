@@ -113,6 +113,7 @@ while game_on
           puts
           puts "*** #{runner.name} was caught too many times, they lose a point! ***" 
           selected_player.lose_point
+          failures = 0
         end
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
