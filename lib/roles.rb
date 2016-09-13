@@ -1,8 +1,8 @@
 module Obtainable
-  attr_reader :garage
+  attr_reader :repairer
 
-  def garage
-    @garage ||= ::Garage.new
+  def repairer
+    @repairer ||= ::Garage.new
   end
 
   def obtainable?(current_round)
@@ -10,7 +10,7 @@ module Obtainable
   end
 
   def being_repaired?(current_round)
-    garage.repairing?(self, current_round)
+    repairer.repairing?(self, current_round)
   end
 
   def repair_time
@@ -18,7 +18,7 @@ module Obtainable
   end
 
   def repair(current_round)
-    garage.repair(self, current_round)
+    repairer.repair(self, current_round)
   end
 
   def name

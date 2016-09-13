@@ -253,7 +253,7 @@ class Bicycle
   attr_reader :parts
 
   def initialize(args)
-    @garage = args[:garage]
+    @repairer = args[:garage]
     @parts = args[:parts]
     @broken_parts = Array.new
   end
@@ -279,7 +279,7 @@ class Skateboard
   attr_reader :parts
 
   def initialize(args)
-    @garage = args[:garage]
+    @repairer = args[:garage]
     @parts = args[:parts]
     @broken_parts = Array.new
   end
@@ -305,7 +305,7 @@ class Rollerblades
   attr_reader :parts
 
   def initialize(args)
-    @garage = args[:garage]
+    @repairer = args[:garage]
     @parts = args[:parts]
     @broken_parts = Array.new
   end
