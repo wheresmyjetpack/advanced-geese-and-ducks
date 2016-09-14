@@ -47,7 +47,7 @@ class Player
   end
 
   def broken_item?
-    # check if item is broken, always return false if no item for chaser
+    # check if item is broken, always return false if no item for player
     if @obtainable
       @obtainable.broken_parts?
     else
@@ -223,9 +223,9 @@ class Bicycle
   def initialize(args)
     @repairer = args[:garage]
     @parts = args[:parts]
-    @broken_parts = Array.new
   end
 
+  public
   def speed
     rand(1..2) + parts_quality
   end
@@ -249,9 +249,9 @@ class Skateboard
   def initialize(args)
     @repairer = args[:garage]
     @parts = args[:parts]
-    @broken_parts = Array.new
   end
 
+  public
   def speed
     1 + parts_quality
   end
@@ -268,16 +268,16 @@ end
 
 
 class Rollerblades
-  include Obtainable
-  include BreakableParts
+  include ::Obtainable
+  include ::BreakableParts
   attr_reader :parts
 
   def initialize(args)
     @repairer = args[:garage]
     @parts = args[:parts]
-    @broken_parts = Array.new
   end
 
+  public
   def speed
     parts_quality
   end
@@ -368,8 +368,8 @@ class Garage
   public
   def repair(obtainable, round)
     # set the value of the obtainable in the repair_shop to the round repairs started
-    repair_shop[obtainable.to_s] = round
     puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + round + 1}"
+    repair_shop[obtainable.name] = round
   end
 
   def repairing?(obtainable, current_round)
@@ -401,4 +401,3 @@ module PartsFactory
     )
   end
 end
-

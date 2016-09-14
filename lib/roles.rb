@@ -1,4 +1,5 @@
 module Chaser
+  public
   def catches?(runner)
     distracted? ? distracted : determine_speed >= runner.run
   end
@@ -30,6 +31,11 @@ end
 module Obtainable
   attr_reader :repairer
 
+  public
+  def name
+    self.class.to_s
+  end
+
   def repairer
     @repairer ||= ::Garage.new
   end
@@ -38,20 +44,13 @@ module Obtainable
     !being_repaired?(current_round)
   end
 
+  private
   def being_repaired?(current_round)
     repairer.repairing?(self, current_round)
   end
 
-  def repair_time
-    0
-  end
-
   def repair(current_round)
     repairer.repair(self, current_round)
-  end
-
-  def name
-    self.class.to_s
   end
 end
 
@@ -60,10 +59,6 @@ module BreakableParts
   public
   def parts
     @parts ||= ::Parts.new
-  end
-
-  def broken_parts
-    parts.broken_parts
   end
 
   def repair_time
@@ -79,6 +74,10 @@ module BreakableParts
   end
 
   private
+  def broken_parts
+    parts.broken_parts
+  end
+
   def num_broken_parts
     broken_parts.size
   end
