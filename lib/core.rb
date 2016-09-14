@@ -343,17 +343,18 @@ class Part
   
   public
   def broken?
-    breaks?
+    broken = rand() <= @break_chance
+    if broken
+      needs_repairs
+    else
+      false
+    end
   end
 
   private
-  def breaks?
-    broken = rand() <= @break_chance
-    if broken
-      puts "*** The #{description} #{name} broke ***"
-      return broken
-    end
-    broken
+  def needs_repairs
+    puts "*** The #{description} #{name} broke ***"
+    true  # return true to indicate that the part is broken
   end
 end
 
