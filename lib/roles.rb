@@ -1,3 +1,32 @@
+module Chaser
+  def catches?(runner)
+    distracted? ? distracted : determine_speed >= runner.run
+  end
+
+  private
+  # implementers can overriide any of the following
+  def distracted?
+    false
+  end
+
+  def determine_speed
+    base_speed + bonus_speed
+  end
+
+  def base_speed
+    1
+  end
+
+  def bonus_speed
+    0
+  end
+
+  def distracted
+    raise NotImplementedError
+  end
+end
+
+
 module Obtainable
   attr_reader :repairer
 

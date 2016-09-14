@@ -1,33 +1,19 @@
 require 'forwardable'
 require_relative 'roles'
 
-class Chaser
-  attr_reader :name, :breed, :points
-  attr_accessor :position
+class Player
+  attr_reader :breed
+  attr_accessor :position, :points
 
   def initialize(args)
     @name = args[:name]
-    @breed = args[:breed] || default_breed
     @points = 0
-    @obtainable = nil
     post_initialize(args)
-  end
-
-  def post_initialize(args)
-    nil
   end
 
   public
   def name
     "#{@name} the #{breed}"
-  end
-
-  def distracted?
-    false
-  end
-
-  def catches?(runner)
-    distracted? ? distracted : determine_speed >= runner.run
   end
 
   def score
@@ -56,20 +42,6 @@ class Chaser
   end
 
   private
-  def determine_speed
-    base_speed + bonus_speed
-  end
-
-  def base_speed
-    1
-  end
-
-  def bonus_speed
-    bonus = 0
-    bonus += obtainable_speed
-    bonus
-  end
-
   def obtainable_speed
     @obtainable ? @obtainable.speed : 0
   end
@@ -90,21 +62,26 @@ class Chaser
   def default_breed
     raise NotImplementedError
   end
-
-  def distracted
-    raise NotImplementedError
-  end
 end
 
 
-class Duck < Chaser
+class Duck < Player
+  include ::Chaser
+  attr_reader :base_speed
+
+  def post_initialize(args)
+    @breed = args[:breed] || default_breed
+    @base_speed = 2
+    @obtainable = nil
+  end
+
   private
   def determine_speed
     base_speed + rand(-1..5) + bonus_speed
   end
 
-  def base_speed
-    2
+  def bonus_speed
+    obtainable_speed
   end
 
   def default_breed
@@ -113,16 +90,19 @@ class Duck < Chaser
 end
 
 
-class Dog < Chaser
+class Dog < Player
+  include ::Chaser
+  attr_reader :base_speed
+  attr_accessor :toys
+
   def post_initialize(args)
+    @breed = args[:breed] || default_breed
+    @base_speed = 3
     @toys = 0
+    @obtainable = nil
   end
 
-  public
-  def distracted?
-    [true, false, false].sample
-  end
-
+  private
   def distracted
     if found_toy?
       add_toy
@@ -131,7 +111,6 @@ class Dog < Chaser
     end
   end
 
-  private
   def add_toy
     @toys += 1
     unless max_toys?
@@ -141,12 +120,12 @@ class Dog < Chaser
     end
   end
 
-  def base_speed
-    3
+  def distracted?
+    [true, false, false].sample
   end
 
   def max_toys?
-    @toys >= 3
+    toys >= 3
   end
 
   def determine_speed
@@ -154,13 +133,12 @@ class Dog < Chaser
   end
 
   def bonus_speed
-    bonus = 0
-    if max_toys?
-      bonus += rand(1..2)
-      @toys = 0
-    end
-    bonus += obtainable_speed
-    bonus
+    max_toys? ? (obtainable_speed + toy_bonus) : obtainable_speed
+  end
+
+  def toy_bonus
+    toys = 0
+    rand(1..2)
   end
 
   def found_toy?
@@ -173,23 +151,15 @@ class Dog < Chaser
 end
 
 
-class Cat < Chaser
+class Cat < Player
+  include ::Chaser
+  attr_reader :base_speed
+
   def post_initialize(args)
+    @breed = args[:breed] || default_breed
+    @base_speed = 3
+    @obtainable = nil
     @catnip = false
-  end
-
-  public
-  def distracted?
-    @catnip ? false : [true, false].sample
-  end
-
-  def distracted
-    if found_catnip?
-      add_catnip
-      puts "#{self.name} found some catnip, they seem really excited for the next round!"
-    else
-      puts "MEOW! #{self.name} got distracted by a ball of yarn!"
-    end
   end
 
   private
@@ -197,23 +167,25 @@ class Cat < Chaser
     (base_speed * rand(1..3)) + 1 + bonus_speed
   end
 
-  def base_speed
-    3
-  end
-  
   def bonus_speed
-    bonus = 0
-    bonus += obtainable_speed
-    bonus += use_catnip if @catnip
-    bonus
+    @catnip ? (obtainable_speed + use_catnip) : obtainable_speed
+  end
+
+  def distracted?
+    @catnip ? false : [true, false].sample
+  end
+
+  def distracted
+    if found_catnip?
+      @catnip = true
+      puts "#{self.name} found some catnip, they seem really excited for the next round!"
+    else
+      puts "MEOW! #{self.name} got distracted by a ball of yarn!"
+    end
   end
 
   def found_catnip?
     [true, false, false].sample
-  end
-
-  def add_catnip
-    @catnip = true
   end
 
   def use_catnip
@@ -228,28 +200,24 @@ end
 
 
 class Goose
-  attr_reader :name
+  attr_reader :name, :base_speed
   attr_accessor :position
 
   def initialize(args)
     @name = args[:name]
+    @base_speed = 3
   end
 
   public
   def run
     base_speed + rand(1..3)
   end
-
-  private
-  def base_speed
-    3
-  end
 end
 
 
 class Bicycle
-  include Obtainable
-  include BreakableParts
+  include ::Obtainable
+  include ::BreakableParts
   attr_reader :parts
 
   def initialize(args)
@@ -274,8 +242,8 @@ end
 
 
 class Skateboard
-  include Obtainable
-  include BreakableParts
+  include ::Obtainable
+  include ::BreakableParts
   attr_reader :parts
 
   def initialize(args)
@@ -321,35 +289,6 @@ class Rollerblades
   private
   def parts_quality
     parts.quality
-  end
-end
-
-
-class Garage
-  attr_reader :repair_shop
-
-  def initialize
-    @repair_shop = {}
-  end
-
-  public
-  def repair(obtainable, round)
-    # set the value of the obtainable in the repair_shop to the round repairs started
-    repair_shop[obtainable.to_s] = round
-    puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + round + 1}"
-  end
-
-  def repairing?(obtainable, current_round)
-    still_repairing = (started_repairing(obtainable) + obtainable.repair_time) >= current_round
-    unless still_repairing
-      obtainable.fixed
-    end
-    still_repairing
-  end
-
-  private
-  def started_repairing(obtainable)
-    repair_shop[obtainable.to_s] || 0 - obtainable.repair_time
   end
 end
 
@@ -415,6 +354,35 @@ class Part
       return broken
     end
     broken
+  end
+end
+
+
+class Garage
+  attr_reader :repair_shop
+
+  def initialize
+    @repair_shop = {}
+  end
+
+  public
+  def repair(obtainable, round)
+    # set the value of the obtainable in the repair_shop to the round repairs started
+    repair_shop[obtainable.to_s] = round
+    puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + round + 1}"
+  end
+
+  def repairing?(obtainable, current_round)
+    still_repairing = (started_repairing(obtainable) + obtainable.repair_time) >= current_round
+    unless still_repairing
+      obtainable.fixed
+    end
+    still_repairing
+  end
+
+  private
+  def started_repairing(obtainable)
+    repair_shop[obtainable.to_s] || 0 - obtainable.repair_time
   end
 end
 
