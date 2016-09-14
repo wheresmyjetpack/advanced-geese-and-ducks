@@ -37,20 +37,20 @@ module Obtainable
   end
 
   def repairer
-    @repairer ||= ::Garage.new
+    @repairer ||= ::KnowsRound::Garage.new
   end
 
-  def obtainable?(current_round)
-    !being_repaired?(current_round)
+  def obtainable?
+    !being_repaired?
+  end
+
+  def repair
+    repairer.repair(self)
   end
 
   private
-  def being_repaired?(current_round)
-    repairer.repairing?(self, current_round)
-  end
-
-  def repair(current_round)
-    repairer.repair(self, current_round)
+  def being_repaired?
+    repairer.repairing?(self)
   end
 end
 

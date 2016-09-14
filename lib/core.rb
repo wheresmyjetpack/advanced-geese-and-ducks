@@ -24,8 +24,8 @@ class Player
     @points -= 1
   end
 
-  def obtain(item, current_round)
-    if item.obtainable?(current_round)
+  def obtain(item)
+    if item.obtainable?
       @obtainable = item
     else
       puts "That item is unavailable right now!"
@@ -33,10 +33,10 @@ class Player
     end
   end
 
-  def repair_if_broken(current_round)
+  def repair_if_broken
     if broken_item?
       puts "#{name}'s #{@obtainable.name} broke! Sending it to the garage for repairs"
-      repair_item(current_round)
+      repair_item
       @obtainable = nil
     end
   end
@@ -55,8 +55,8 @@ class Player
     end
   end
 
-  def repair_item(current_round)
-    @obtainable.repair(current_round)
+  def repair_item
+    @obtainable.repair
   end
 
   def default_breed
@@ -358,31 +358,40 @@ class Part
 end
 
 
-class Garage
-  attr_reader :repair_shop
+module KnowsRound
+  attr_accessor :current_round
+  @current_round = 0
 
-  def initialize
-    @repair_shop = {}
-  end
+  class Garage
+    attr_reader :repair_shop
 
-  public
-  def repair(obtainable, round)
-    # set the value of the obtainable in the repair_shop to the round repairs started
-    puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + round + 1}"
-    repair_shop[obtainable.name] = round
-  end
-
-  def repairing?(obtainable, current_round)
-    still_repairing = (started_repairing(obtainable) + obtainable.repair_time) >= current_round
-    unless still_repairing
-      obtainable.fixed
+    def initialize
+      @repair_shop = {}
     end
-    still_repairing
-  end
 
-  private
-  def started_repairing(obtainable)
-    repair_shop[obtainable.to_s] || 0 - obtainable.repair_time
+    public
+    def repair(obtainable)
+      # set the value of the obtainable in the repair_shop to the round repairs started
+      puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + KnowsRound.current_round + 1}"
+      repair_shop[obtainable.name] = KnowsRound.current_round
+    end
+
+    def repairing?(obtainable)
+      still_repairing = (started_repairing(obtainable) + obtainable.repair_time) >= KnowsRound.current_round
+      unless still_repairing
+        obtainable.fixed
+      end
+      still_repairing
+    end
+
+    private
+    def started_repairing(obtainable)
+      repair_shop[name_of(obtainable)] || 0 - obtainable.repair_time
+    end
+
+    def name_of(obtainable)
+      obtainable.name
+    end
   end
 end
 

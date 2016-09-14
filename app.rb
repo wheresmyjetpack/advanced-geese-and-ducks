@@ -52,7 +52,7 @@ num_players.times do
   circle << player
 
   obtainables = Array.new
-  garage = Garage.new
+  garage = KnowsRound::Garage.new
 
   obtainable_types.each do |type, config|
     obtainables << type.new(
@@ -72,7 +72,8 @@ circle.each { |p| p.position = circle.find_index(p) }
 # get a random player to be the first runner
 selected_player = circle.sample   # this also will hold the Chaser object while that player is the runner
 game_on = true
-current_round = 1
+include KnowsRound
+KnowsRound.current_round = 1
 failures = 0
 
 while game_on
@@ -84,7 +85,7 @@ while game_on
   puts 
 
   loop do
-    puts "Round: #{current_round}"
+    puts "Round: #{KnowsRound.current_round}"
     next_to = circle[runner.position]
     player_type = next_to.class
     puts "Standing next to #{next_to.name}"
@@ -106,7 +107,7 @@ while game_on
 
       if chaser.catches?(runner)
         puts "#{chaser.name} caught #{runner.name}!"
-        chaser.repair_if_broken(current_round)
+        chaser.repair_if_broken
         puts "#{runner.name} is still the runner"
         failures += 1
         if failures == 3
@@ -117,7 +118,7 @@ while game_on
         end
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
-        chaser.repair_if_broken(current_round)
+        chaser.repair_if_broken
         circle << selected_player
         selected_player.score
         puts "#{selected_player.name}'s points: #{selected_player.points}"
@@ -128,12 +129,12 @@ while game_on
           puts player_garages[selected_player.name].map { |k, v| "#{k}) #{v.name}" }.join("\n") + "\n\n"
           obtainable = player_garages[selected_player.name][gets.to_i]
           puts "Selected the #{obtainable.name}"
-          selected_player.obtain(obtainable, current_round)
+          selected_player.obtain(obtainable)
         end
         selected_player = chaser
         runner = nil
         puts "Starting a new round"
-        current_round += 1
+        KnowsRound.current_round += 1
         failures = 0
         puts "=" * 16
         puts
