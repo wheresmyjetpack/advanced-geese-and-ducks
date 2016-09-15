@@ -33,7 +33,7 @@ module Obtainable
 
   public
   def name
-    self.class.to_s
+    self.class.to_s.downcase
   end
 
   def repairer
@@ -45,12 +45,17 @@ module Obtainable
   end
 
   def repair
+    local_notify_repairs
     repairer.repair(self)
   end
 
   private
   def being_repaired?
     repairer.repairing?(self)
+  end
+
+  def local_notify_repairs
+    nil
   end
 end
 
@@ -71,11 +76,7 @@ module BreakableParts
   end
 
   def broken_parts?
-    broken = parts.broken_parts?
-    if broken
-      repair
-    end
-    broken
+    parts.broken_parts?
   end
 
   private

@@ -27,6 +27,7 @@ class Player
   def obtain(item)
     if item.obtainable?
       @obtainable = item
+      @obtainable.owner = name
     else
       puts "That item is unavailable right now!"
       puts
@@ -35,15 +36,15 @@ class Player
 
   private
   def obtainable_speed
-    unless @obtainable.nil? || !rideable?(@obtainable)
+    unless @obtainable.nil? || unrideable?(@obtainable)
       @obtainable.speed
     else
       0
     end
   end
 
-  def rideable?(rideable)
-    rideable.obtainable?
+  def unrideable?(rideable)
+    !rideable.obtainable?
   end
 
   def default_breed
@@ -205,16 +206,19 @@ end
 class Bicycle
   include ::BreakableParts
   attr_reader :parts
+  attr_accessor :owner
 
   def initialize(args)
     @repairer = args[:garage]
     @parts = args[:parts]
+    @owner = nil
   end
 
   public
   def speed
     if broken_parts?
-      0
+      repair
+      -2
     else
       rand(1..2) + parts_quality
     end
@@ -228,21 +232,32 @@ class Bicycle
   def parts_quality
     parts.quality
   end
+
+  def local_notify_repairs
+    puts "#{owner}'s #{name} broke, sending to the garage for repairs"
+  end
 end
 
 
 class Skateboard
   include ::BreakableParts
   attr_reader :parts
+  attr_accessor :owner
 
   def initialize(args)
     @repairer = args[:garage]
     @parts = args[:parts]
+    @owner = nil
   end
 
   public
   def speed
-    1 + parts_quality
+    if broken_parts?
+      repair
+      -2
+    else
+      1 + parts_quality
+    end
   end
 
   def repair_time
@@ -253,21 +268,32 @@ class Skateboard
   def parts_quality
     parts.quality
   end
+
+  def local_notify_repairs
+    puts "#{owner}'s #{name} broke, sending to the garage for repairs"
+  end
 end
 
 
 class Rollerblades
   include ::BreakableParts
   attr_reader :parts
+  attr_accessor :owner
 
   def initialize(args)
     @repairer = args[:garage]
     @parts = args[:parts]
+    @owner = nil
   end
 
   public
   def speed
-    parts_quality
+    if broken_parts?
+      repair
+      -2
+    else
+      parts_quality
+    end
   end
 
   def repair_time
@@ -277,6 +303,10 @@ class Rollerblades
   private
   def parts_quality
     parts.quality
+  end
+
+  def local_notify_repairs
+    puts "#{owner}'s #{name} broke, sending to the garage for repairs"
   end
 end
 
@@ -362,6 +392,7 @@ module KnowsRound
     def repair(obtainable)
       # set the value of the obtainable in the repair_shop to the round repairs started
       puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + KnowsRound.current_round + 1}"
+      puts
       repair_shop[obtainable.name] = KnowsRound.current_round
     end
 
