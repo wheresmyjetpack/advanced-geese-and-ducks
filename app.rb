@@ -3,9 +3,9 @@
 require 'io/console'
 require_relative 'lib/core'
 require_relative 'lib/helpers'
+require_relative 'lib/config'
 
 player_classes = [Duck, Dog, Cat]
-
 
 class_hash = Hash[ (1...player_classes.size + 1).zip player_classes ]
 
@@ -15,30 +15,10 @@ puts
 circle = Array.new
 player_garages = Hash.new
 
-bicycle_config = [
-  ['tires', '24"', 1, 0.10],
-  ['chain', '6-speed', 1, 0.1],
-  ['gears', '6-speed', 2, 0.09],
-  ['frame', 'road bike', 1, 0.05],
-  ['brakes', 'old and rusted', 0, 0.09]
-]
-
-rollerblades_config = [
-  ['wheels', 'recreational', 1, 0.02],
-  ['boot', 'recreational', 0],
-  ['bearings', 'ABEC rating 5', 1, 0.07]
-]
-
-skateboard_config = [
-  ['deck', 'shortboard', 1, 0.08],
-  ['wheels', 'low-grade', 1, 0.03],
-  ['bearings', 'ABEC rating 5', 1, 0.07]
-]
-
 obtainable_types = {
-  Bicycle => bicycle_config, 
-  Skateboard => skateboard_config,
-  Rollerblades => rollerblades_config
+  Bicycle => ObtainableConfig.bicycle_config, 
+  Skateboard => ObtainableConfig.skateboard_config,
+  Rollerblades => ObtainableConfig.rollerblades_config
 }
 
 num_players.times do
@@ -92,6 +72,7 @@ while game_on
     keypress = STDIN.getch
 
     case keypress
+
     when " "
       puts "#{player_type}..."
       unless runner.position >= circle.length - 1
@@ -100,6 +81,7 @@ while game_on
         runner.position = 0
       end
       puts
+
     when "\r"
       puts "Goose!"
       puts
@@ -107,22 +89,23 @@ while game_on
 
       if chaser.catches?(runner)
         puts "#{chaser.name} caught #{runner.name}!"
-        chaser.repair_if_broken
         puts "#{runner.name} is still the runner"
         failures += 1
+
         if failures == 3
           puts
           puts "*** #{runner.name} was caught too many times, they lose a point! ***" 
           selected_player.lose_point
           failures = 0
         end
+
       else
         puts "#{runner.name} made it back to #{chaser.name}'s spot safely!"
-        chaser.repair_if_broken
         circle << selected_player
         selected_player.score
         puts "#{selected_player.name}'s points: #{selected_player.points}"
-        if selected_player.points % 3 == 0
+
+        if selected_player.points % 3 == 0 && selected_player.points != 0
           puts "#{selected_player.name} gained enough points to acquire an item!"
           puts "Select an item from the menu:"
           puts
@@ -131,6 +114,7 @@ while game_on
           puts "Selected the #{obtainable.name}"
           selected_player.obtain(obtainable)
         end
+
         selected_player = chaser
         runner = nil
         puts "Starting a new round"
@@ -141,9 +125,11 @@ while game_on
         break
       end
       puts
+
     when "q"
       game_on = false
       break
+
     else
       puts "Not a valid option"
     end

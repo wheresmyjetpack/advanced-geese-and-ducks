@@ -33,30 +33,17 @@ class Player
     end
   end
 
-  def repair_if_broken
-    if broken_item?
-      puts "#{name}'s #{@obtainable.name} broke! Sending it to the garage for repairs"
-      repair_item
-      @obtainable = nil
-    end
-  end
-
   private
   def obtainable_speed
-    @obtainable ? @obtainable.speed : 0
-  end
-
-  def broken_item?
-    # check if item is broken, always return false if no item for player
-    if @obtainable
-      @obtainable.broken_parts?
+    unless @obtainable.nil? || !rideable?(@obtainable)
+      @obtainable.speed
     else
-      false
+      0
     end
   end
 
-  def repair_item
-    @obtainable.repair
+  def rideable?(rideable)
+    rideable.obtainable?
   end
 
   def default_breed
@@ -210,13 +197,12 @@ class Goose
 
   public
   def run
-    base_speed + rand(1..3)
+    base_speed + rand(2..5)
   end
 end
 
 
 class Bicycle
-  include ::Obtainable
   include ::BreakableParts
   attr_reader :parts
 
@@ -227,7 +213,11 @@ class Bicycle
 
   public
   def speed
-    rand(1..2) + parts_quality
+    if broken_parts?
+      0
+    else
+      rand(1..2) + parts_quality
+    end
   end
 
   def repair_time
@@ -242,7 +232,6 @@ end
 
 
 class Skateboard
-  include ::Obtainable
   include ::BreakableParts
   attr_reader :parts
 
@@ -268,7 +257,6 @@ end
 
 
 class Rollerblades
-  include ::Obtainable
   include ::BreakableParts
   attr_reader :parts
 

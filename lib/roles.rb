@@ -56,6 +56,7 @@ end
 
 
 module BreakableParts
+  include ::Obtainable
   public
   def parts
     @parts ||= ::Parts.new
@@ -70,7 +71,11 @@ module BreakableParts
   end
 
   def broken_parts?
-    parts.broken_parts?
+    broken = parts.broken_parts?
+    if broken
+      repair
+    end
+    broken
   end
 
   private
