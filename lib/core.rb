@@ -332,13 +332,17 @@ class Parts
   end
 
   def broken_parts?
-    each do |part|
-      broken_parts << part if broken?(part)
-    end
+    accumulate_broken
     broken_parts.empty? ? false : true
   end
 
   private
+  def accumulate_broken
+    each do |part|
+      broken_parts << part if broken?(part)
+    end
+  end
+
   def enhancement_of(part)
     part.speed_boost
   end
@@ -361,18 +365,18 @@ class Part
   
   public
   def broken?
-    broken = rand() <= @break_chance
+    broken = needs_repairs?
     if broken
-      needs_repairs
+      puts "*** The #{description} #{name} broke ***"
+      true  # return true to indicate that the part is broken
     else
       false
     end
   end
 
   private
-  def needs_repairs
-    puts "*** The #{description} #{name} broke ***"
-    true  # return true to indicate that the part is broken
+  def needs_repairs?
+    rand() <= @break_chance
   end
 end
 

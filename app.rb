@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'io/console'
-require_relative 'lib/core'
-require_relative 'lib/helpers'
-require_relative 'lib/config'
+require './lib/core'
+require './lib/helpers'
+require './lib/config'
 
 player_classes = [Duck, Dog, Cat]
 
