@@ -209,7 +209,7 @@ class Bicycle
   attr_accessor :owner
 
   def initialize(args)
-    @repairer = args[:garage]
+    @repairer = args[:repairer]
     @parts = args[:parts]
     @owner = nil
   end
@@ -245,7 +245,7 @@ class Skateboard
   attr_accessor :owner
 
   def initialize(args)
-    @repairer = args[:garage]
+    @repairer = args[:repairer]
     @parts = args[:parts]
     @owner = nil
   end
@@ -281,7 +281,7 @@ class Rollerblades
   attr_accessor :owner
 
   def initialize(args)
-    @repairer = args[:garage]
+    @repairer = args[:repairer]
     @parts = args[:parts]
     @owner = nil
   end

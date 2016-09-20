@@ -17,6 +17,7 @@ class PartStub
   end
 end
 
+
 class BrokenPartStub
   def broken?
     true
@@ -74,5 +75,67 @@ class PartsTest < MiniTest::Test
   def test_quality_of_parts
     parts = Parts.new([PartStub.new, PartStub.new, PartStub.new])
     assert_equal 3, parts.quality
+  end
+end
+
+
+class BicycleTest < MiniTest::Test
+  class BrokenPartsStub
+    def broken_parts?
+      true
+    end
+
+    def broken_parts
+      [1]
+    end
+  end
+
+  class IntactPartsStub
+    def broken_parts?
+      false
+    end
+
+    def broken_parts
+      []
+    end
+
+    def quality
+      0
+    end
+  end
+
+  class RepairerStub
+    def repair(obtainable)
+      nil
+    end
+  end
+
+  def setup
+    @broken_bicycle = Bicycle.new(
+      parts: BrokenPartsStub.new,
+      repairer: RepairerStub.new
+    )
+    
+    @stable_bicycle = Bicycle.new(
+      parts: IntactPartsStub.new,
+      repairer: RepairerStub.new
+    )
+  end
+  def test_speed_is_lowered_when_parts_are_broken
+    assert @broken_bicycle.speed < 0
+  end
+
+  def test_speed_between_one_and_two_when_parts_intact
+    100.times do
+      assert_in_delta 1, @stable_bicycle.speed, 1
+    end
+  end
+
+  def test_repair_time_is_zero_when_all_parts_intact
+    assert_equal 0, @stable_bicycle.repair_time
+  end
+
+  def test_repair_time_greater_than_zero_when_any_parts_broken
+    assert @broken_bicycle.repair_time > 0
   end
 end
