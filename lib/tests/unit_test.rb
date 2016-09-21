@@ -1,16 +1,6 @@
 require '../core'
 require 'minitest/autorun'
 
-class PartDouble < Part
-  attr_writer :break_chance
-end
-
-
-class PartsDouble < Parts
-  attr_writer :broken_parts
-end
-
-
 class PartStub
   def speed_boost
     1
@@ -33,28 +23,48 @@ end
 
 
 class PartTest < MiniTest::Test
-  def setup
-    @part = PartDouble.new(
+  def test_implements_the_breakable_interface
+    part = Part.new(
       name: 'name',
       description: 'description',
       speed_boost: 1,
-      break_chance: 0.5
+      break_chance: 0.0
     )
+    assert_respond_to part, :broken?
   end
 
   def test_doesnt_break_with_0_precent_break_chance
-    @part.break_chance = 0.0  # 0% break chance
-    assert !@part.broken?
+    part = Part.new(
+      name: 'name',
+      description: 'description',
+      speed_boost: 1,
+      break_chance: 0.0
+    )
+    assert !part.broken?
   end
 
   def test_breaks_with_100_precent_break_chance
-    @part.break_chance = 1.0  # 100% break chance
-    assert @part.broken?
+    part = Part.new(
+      name: 'name',
+      description: 'description',
+      speed_boost: 1,
+      break_chance: 1.0
+    )
+    assert part.broken?
   end
 end
 
 
 class PartsTest < MiniTest::Test
+  class PartsDouble < Parts
+    attr_accessor :broken_parts
+  end
+
+  def test_implements_the_breakables_interface
+    parts = Parts.new([])
+    assert_respond_to parts, :broken_parts?
+  end
+
   def test_broken_parts_true_if_any_broken_parts
     parts = Parts.new([BrokenPartStub.new, BrokenPartStub.new, StablePartStub.new])
     assert parts.broken_parts?
@@ -65,11 +75,9 @@ class PartsTest < MiniTest::Test
     assert !parts.broken_parts?
   end
 
-  def test_fix_empties_broken_parts
-    parts = PartsDouble.new([BrokenPartStub.new])
-    parts.each { |p| parts.broken_parts << p }
-    parts.fix
-    assert_empty parts.broken_parts
+  def test_fix_empties_the_broken_parts_array
+    parts = Parts.new([BrokenPartStub.new])
+    assert_empty parts.fix
   end
 
   def test_quality_of_parts
@@ -121,14 +129,14 @@ class BicycleTest < MiniTest::Test
       repairer: RepairerStub.new
     )
   end
-  def test_speed_is_lowered_when_parts_are_broken
-    assert @broken_bicycle.speed < 0
+
+  def test_speed_is_less_negative_two_when_any_parts_broken
+    assert_equal @broken_bicycle.speed, -2
   end
 
-  def test_speed_between_one_and_two_when_parts_intact
-    100.times do
-      assert_in_delta 1, @stable_bicycle.speed, 1
-    end
+  def test_speed_is_either_one_or_two_when_all_parts_intact
+    bicycle_speed = @stable_bicycle.speed
+    assert (bicycle_speed == 1 || bicycle_speed == 2)
   end
 
   def test_repair_time_is_zero_when_all_parts_intact
@@ -136,6 +144,6 @@ class BicycleTest < MiniTest::Test
   end
 
   def test_repair_time_greater_than_zero_when_any_parts_broken
-    assert @broken_bicycle.repair_time > 0
+    assert_equal @broken_bicycle.repair_time, 5
   end
 end
