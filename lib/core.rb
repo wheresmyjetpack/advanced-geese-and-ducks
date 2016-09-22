@@ -359,7 +359,7 @@ end
 
 
 class Part
-  attr_reader :name, :description, :speed_boost
+  attr_reader :name, :description, :speed_boost, :break_chance
 
   def initialize(args)
     @name = args[:name]
@@ -381,7 +381,7 @@ class Part
 
   private
   def needs_repairs?
-    rand() <= @break_chance
+    rand() <= break_chance
   end
 end
 

@@ -2,80 +2,60 @@ require '../core'
 require 'minitest/autorun'
 
 class PartTest < MiniTest::Test
-  def test_implements_the_breakable_interface
-    part = Part.new(
+  def setup
+    @part = Part.new(
       name: 'name',
       description: 'description',
       speed_boost: 1,
       break_chance: 0.0
     )
-    assert_respond_to part, :broken?
+  end
+
+  def test_implements_the_breakable_interface
+    assert_respond_to @part, :broken?
   end
 
   def test_doesnt_break_with_0_precent_break_chance
-    part = Part.new(
-      name: 'name',
-      description: 'description',
-      speed_boost: 1,
-      break_chance: 0.0
-    )
-    assert !part.broken?
+    assert !@part.broken?
   end
 
   def test_breaks_with_100_precent_break_chance
-    part = Part.new(
-      name: 'name',
-      description: 'description',
-      speed_boost: 1,
-      break_chance: 1.0
-    )
-    assert part.broken?
+    @part.stub :break_chance, 1.0 do
+      assert @part.broken?
+    end
   end
 end
 
 
 class PartsTest < MiniTest::Test
-  class PartStub
-    def speed_boost
-      1
-    end
-  end
-
-  class BrokenPartStub
-    def broken?
-      true
-    end
-  end
-
-  class StablePartStub
-    def broken?
-      false
-    end
+  def setup
+    @part = Part.new(name: "name", description: "description", speed_boost: 1, break_chance: 0.0)
+    @parts = Parts.new([@part])
   end
 
   def test_implements_the_breakables_interface
-    parts = Parts.new([])
-    assert_respond_to parts, :broken_parts?
+    assert_respond_to @parts, :broken_parts?
   end
 
   def test_broken_parts_true_if_any_broken_parts
-    parts = Parts.new([BrokenPartStub.new, BrokenPartStub.new, StablePartStub.new])
-    assert parts.broken_parts?
+    @part.stub :broken?, true do
+      assert_equal true, @parts.broken_parts?
+    end
   end
 
   def test_broken_parts_false_if_no_broken_parts
-    parts = Parts.new([StablePartStub.new])
-    assert !parts.broken_parts?
+    assert_equal false, @parts.broken_parts?
   end
 
   def test_fix_empties_the_broken_parts_array
-    parts = Parts.new([BrokenPartStub.new])
-    assert_empty parts.fix
+    @part.stub :broken?, true do
+      @parts.broken_parts?
+      assert_empty @parts.fix
+    end
   end
 
-  def test_quality_of_parts
-    parts = Parts.new([PartStub.new, PartStub.new, PartStub.new])
-    assert_equal 3, parts.quality
+  def test_quality_of_parts_is_equal_to_total_part_quality
+    assert_equal 1, @parts.quality
   end
 end
 
