@@ -44,12 +44,12 @@ module Obtainable
     !being_repaired?
   end
 
+  private
   def repair
     local_notify_repairs
     repairer.repair(self)
   end
 
-  private
   def being_repaired?
     repairer.repairing?(self)
   end
@@ -75,11 +75,11 @@ module BreakableParts
     parts.fix
   end
 
+  private
   def broken_parts?
     parts.broken_parts?
   end
 
-  private
   def num_broken_parts
     parts.num_broken_parts
   end
