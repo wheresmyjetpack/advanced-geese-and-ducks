@@ -329,11 +329,16 @@ class Parts
 
   def fix
     broken_parts.clear
+    @broken_parts
   end
 
   def broken_parts?
     accumulate_broken
     broken_parts.empty? ? false : true
+  end
+
+  def num_broken_parts
+    broken_parts.size
   end
 
   private

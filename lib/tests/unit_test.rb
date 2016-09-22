@@ -1,27 +1,6 @@
 require '../core'
 require 'minitest/autorun'
 
-class PartStub
-  def speed_boost
-    1
-  end
-end
-
-
-class BrokenPartStub
-  def broken?
-    true
-  end
-end
-
-
-class StablePartStub
-  def broken?
-    false
-  end
-end
-
-
 class PartTest < MiniTest::Test
   def test_implements_the_breakable_interface
     part = Part.new(
@@ -56,8 +35,22 @@ end
 
 
 class PartsTest < MiniTest::Test
-  class PartsDouble < Parts
-    attr_accessor :broken_parts
+  class PartStub
+    def speed_boost
+      1
+    end
+  end
+
+  class BrokenPartStub
+    def broken?
+      true
+    end
+  end
+
+  class StablePartStub
+    def broken?
+      false
+    end
   end
 
   def test_implements_the_breakables_interface
@@ -88,30 +81,6 @@ end
 
 
 class BicycleTest < MiniTest::Test
-  class BrokenPartsStub
-    def broken_parts?
-      true
-    end
-
-    def broken_parts
-      [1]
-    end
-  end
-
-  class IntactPartsStub
-    def broken_parts?
-      false
-    end
-
-    def broken_parts
-      []
-    end
-
-    def quality
-      0
-    end
-  end
-
   class RepairerStub
     def repair(obtainable)
       nil
@@ -119,31 +88,31 @@ class BicycleTest < MiniTest::Test
   end
 
   def setup
-    @broken_bicycle = Bicycle.new(
-      parts: BrokenPartsStub.new,
-      repairer: RepairerStub.new
-    )
-    
-    @stable_bicycle = Bicycle.new(
-      parts: IntactPartsStub.new,
+    @parts = Parts.new([])
+    @bicycle = Bicycle.new(
+      parts: @parts,
       repairer: RepairerStub.new
     )
   end
 
-  def test_speed_is_less_negative_two_when_any_parts_broken
-    assert_equal @broken_bicycle.speed, -2
+  def test_speed_is_negative_two_when_any_parts_broken
+    @parts.stub :broken_parts?, true do
+      assert_equal -2, @bicycle.speed
+    end
   end
 
   def test_speed_is_either_one_or_two_when_all_parts_intact
-    bicycle_speed = @stable_bicycle.speed
+    bicycle_speed = @bicycle.speed
     assert (bicycle_speed == 1 || bicycle_speed == 2)
   end
 
   def test_repair_time_is_zero_when_all_parts_intact
-    assert_equal 0, @stable_bicycle.repair_time
+    assert_equal 0, @bicycle.repair_time
   end
 
-  def test_repair_time_greater_than_zero_when_any_parts_broken
-    assert_equal @broken_bicycle.repair_time, 5
+  def test_repair_time_is_five_when_one_part_broken
+    @parts.stub :num_broken_parts, 1 do
+      assert_equal 5, @bicycle.repair_time
+    end
   end
 end

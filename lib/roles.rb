@@ -80,11 +80,7 @@ module BreakableParts
   end
 
   private
-  def broken_parts
-    parts.broken_parts
-  end
-
   def num_broken_parts
-    broken_parts.size
+    parts.num_broken_parts
   end
 end
