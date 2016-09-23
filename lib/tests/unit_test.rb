@@ -342,6 +342,36 @@ class DogTest < MiniTest::Test
     @obtainable_stub = ObtainableStub.new
     @dog = @object = Dog.new(name: 'dog')
   end
+
+  def test_always_catches_runner_when_runner_speed_is_three_and_not_distracted
+    @runner_stub.stub :run, 3 do
+      attempts = []
+      @dog.stub :distracted?, false do
+        50.times do
+          attempts << @dog.catches?(@runner_stub)
+        end
+      end
+      refute_includes attempts, false
+    end
+  end
+
+  def test_never_catches_runner_when_runner_speed_is_six_and_no_bonus_speed
+    @runner_stub.stub :run, 6 do
+      attempts = []
+      @dog.stub :bonus_speed, 0 do
+        50.times do
+          attempts << @dog.catches?(@runner_stub)
+        end
+      end
+      refute_includes attempts, true
+    end
+  end
+
+  def test_never_catches_runner_when_distracted
+    @dog.stub :distracted?, true do
+      assert_equal false, @dog.catches?(@runner_stub)
+    end
+  end
 end
 
 

@@ -96,6 +96,7 @@ class Dog < Player
     else
       puts "WOOF WOOF! #{name} chased after a squirrel instead!"
     end
+    false
   end
 
   def add_toy

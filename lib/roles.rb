@@ -23,7 +23,7 @@ module Chaser
   end
 
   def distracted
-    raise NotImplementedError
+    false
   end
 end
 
