@@ -111,8 +111,13 @@ while game_on
           puts
           puts player_garages[selected_player.name].map { |k, v| "#{k}) #{v.name}" }.join("\n") + "\n\n"
           obtainable = player_garages[selected_player.name][gets.to_i]
-          puts "Selected the #{obtainable.name}"
-          selected_player.obtain(obtainable)
+          if obtainable.obtainable?
+            selected_player.obtain(obtainable)
+            puts "Selected the #{obtainable.name}"
+          else
+            puts "That item is unavailable right now!"
+            puts
+          end
         end
 
         selected_player = chaser

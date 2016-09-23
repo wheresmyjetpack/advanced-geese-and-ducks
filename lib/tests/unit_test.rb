@@ -231,7 +231,7 @@ class SkateboardTest < MiniTest::Test
 end
 
 
-module PlayerInterfaceTest
+module PlayerTest
   def test_implements_the_score_method
     assert_respond_to @object, :score
   end
@@ -244,84 +244,115 @@ module PlayerInterfaceTest
     assert_respond_to @object, :name
   end
 
-  def test_implements_the_obtain_method
-    assert_respond_to @object, :obtain
+  def test_score_adds_one_to_points
+    @object.score
+    assert_equal 1, @object.points
+  end
+
+  def test_lose_point_subtracts_one_point
+    @object.lose_point
+    assert_equal -1, @object.points
   end
 end
 
 
-module ChaserInterfaceTest
+module ChaserTest
+  class RunnerStub
+    def run
+      1
+    end
+  end
+
   def test_implements_the_chaser_interface
     assert_respond_to @object, :catches?
   end
 end
 
 
-module RunnerDouble
-  class RunnerStub
-    def run
-      1
+module ObtainerTest
+  class ObtainableStub
+    def owned_by(name)
+      nil
     end
+  end
+
+  def test_implements_the_obtain_method
+    assert_respond_to @object, :obtain
+  end
+
+  def test_notifies_obtainable_of_ownership_when_obtained
+    obtainable_mock = MiniTest::Mock.new
+    def obtainable_mock.obtainable?
+      true
+    end
+    obtainable_mock.expect :owned_by, nil, [@object.name]
+    @object.obtain(obtainable_mock)
+    obtainable_mock.verify
+  end
+
+  def test_obtain_sets_the_obtainable_instance_var
+    @object.obtain(@obtainable_stub)
+    assert_same @obtainable_stub, @object.obtainable
   end
 end
 
 
+module RunnerDouble
+end
+
+
 class DuckTest < MiniTest::Test
-  include PlayerInterfaceTest
-  include ChaserInterfaceTest
-  include RunnerDouble
+  include PlayerTest
+  include ChaserTest
+  include ObtainerTest
 
   def setup
-    @runner = RunnerStub.new
-    @obtainable_stub = MiniTest::Mock.new
-    def @obtainable_stub.obtainable?
-      true
-    end
+    @runner_stub = RunnerStub.new
+    @obtainable_stub = ObtainableStub.new
     @duck = @object = Duck.new(name: 'duck')
   end
 
   def test_always_catches_runner_when_runner_speed_is_one
     attempts = []
     50.times do
-      attempts << @duck.catches?(@runner)
+      attempts << @duck.catches?(@runner_stub)
     end
     refute_includes attempts, false
   end
 
   def test_never_catches_runner_when_runner_speed_is_eight
-    @runner.stub :run, 8 do
+    @runner_stub.stub :run, 8 do
       attempts = []
       50.times do
-        attempts << @duck.catches?(@runner)
+        attempts << @duck.catches?(@runner_stub)
       end
       refute_includes attempts, true
     end
-  end
-
-  def test_duck_notifies_obtainable_of_ownership_when_obtained
-    duck_name = @duck.name
-    @obtainable_stub.expect :owned_by, nil, [duck_name]
-    @duck.obtain(@obtainable_stub)
-    @obtainable_stub.verify
   end
 end
 
 
 class DogTest < MiniTest::Test
-  include PlayerInterfaceTest
-  include ChaserInterfaceTest
+  include PlayerTest
+  include ChaserTest
+  include ObtainerTest
 
   def setup
+    @runner_stub = RunnerStub.new
+    @obtainable_stub = ObtainableStub.new
     @dog = @object = Dog.new(name: 'dog')
   end
 end
 
 
 class CatTest < MiniTest::Test
-  include PlayerInterfaceTest
-  include ChaserInterfaceTest
+  include PlayerTest
+  include ChaserTest
+  include ObtainerTest
 
   def setup
+    @runner_stub = RunnerStub.new
+    @obtainable_stub = ObtainableStub.new
     @cat = @object = Cat.new(name: 'cat')
   end
 end

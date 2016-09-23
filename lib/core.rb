@@ -2,7 +2,7 @@ require 'forwardable'
 require_relative 'roles'
 
 class Player
-  attr_reader :breed
+  attr_reader :breed, :obtainable
   attr_accessor :position, :points
 
   def initialize(args)
@@ -25,13 +25,8 @@ class Player
   end
 
   def obtain(item)
-    if item.obtainable?
-      @obtainable = item
-      obtained_by(name)
-    else
-      puts "That item is unavailable right now!"
-      puts
-    end
+    @obtainable = item
+    obtained_by(name)
   end
 
   private
