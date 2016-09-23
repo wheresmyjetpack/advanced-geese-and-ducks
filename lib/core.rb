@@ -152,7 +152,7 @@ class Cat < Player
 
   private
   def determine_speed
-    (base_speed * rand(1..3)) + 1 + bonus_speed
+    (base_speed * rand(1..2)) + 1 + bonus_speed
   end
 
   def bonus_speed
@@ -170,6 +170,7 @@ class Cat < Player
     else
       puts "MEOW! #{self.name} got distracted by a ball of yarn!"
     end
+    false
   end
 
   def found_catnip?

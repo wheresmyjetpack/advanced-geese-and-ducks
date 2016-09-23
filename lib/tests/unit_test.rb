@@ -266,6 +266,12 @@ module ChaserTest
   def test_implements_the_chaser_interface
     assert_respond_to @object, :catches?
   end
+
+  def test_never_catches_runner_when_distracted
+    @object.stub :distracted?, true do
+      assert_equal false, @object.catches?(@runner_stub)
+    end
+  end
 end
 
 
@@ -294,10 +300,6 @@ module ObtainerTest
     @object.obtain(@obtainable_stub)
     assert_same @obtainable_stub, @object.obtainable
   end
-end
-
-
-module RunnerDouble
 end
 
 
@@ -366,12 +368,6 @@ class DogTest < MiniTest::Test
       refute_includes attempts, true
     end
   end
-
-  def test_never_catches_runner_when_distracted
-    @dog.stub :distracted?, true do
-      assert_equal false, @dog.catches?(@runner_stub)
-    end
-  end
 end
 
 
@@ -385,4 +381,31 @@ class CatTest < MiniTest::Test
     @obtainable_stub = ObtainableStub.new
     @cat = @object = Cat.new(name: 'cat')
   end
+
+  def tests_always_cataches_runner_when_runner_speed_is_four_and_not_distracted
+    @runner_stub.stub :run, 4 do
+      attempts = []
+      @cat.stub :distracted?, false do
+        50.times do
+          attempts << @cat.catches?(@runner_stub)
+        end
+      end
+      refute_includes attempts, false
+    end
+  end
+
+  def test_never_catches_runner_when_runner_speed_is_eight_and_no_bonus_speed
+    @runner_stub.stub :run, 8 do
+      attempts = []
+      @cat.stub :bonus_speed, 0 do
+        50.times do
+          attempts << @cat.catches?(@runner_stub)
+        end
+      end
+      refute_includes attempts, true
+    end
+  end
 end
+
+
+# GarageTest
