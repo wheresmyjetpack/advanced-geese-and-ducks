@@ -27,7 +27,7 @@ class Player
   def obtain(item)
     if item.obtainable?
       @obtainable = item
-      @obtainable.owner = name
+      obtained_by(name)
     else
       puts "That item is unavailable right now!"
       puts
@@ -41,6 +41,10 @@ class Player
     else
       0
     end
+  end
+
+  def obtained_by(name)
+    @obtainable.owned_by(name)
   end
 
   def unrideable?(rideable)

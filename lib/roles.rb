@@ -44,6 +44,10 @@ module Obtainable
     !being_repaired?
   end
 
+  def owned_by(name)
+    @owner = name
+  end
+
   private
   def repair
     local_notify_repairs

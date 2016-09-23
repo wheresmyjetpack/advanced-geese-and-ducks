@@ -257,12 +257,52 @@ module ChaserInterfaceTest
 end
 
 
+module RunnerDouble
+  class RunnerStub
+    def run
+      1
+    end
+  end
+end
+
+
 class DuckTest < MiniTest::Test
   include PlayerInterfaceTest
   include ChaserInterfaceTest
+  include RunnerDouble
 
   def setup
+    @runner = RunnerStub.new
+    @obtainable_stub = MiniTest::Mock.new
+    def @obtainable_stub.obtainable?
+      true
+    end
     @duck = @object = Duck.new(name: 'duck')
+  end
+
+  def test_always_catches_runner_when_runner_speed_is_one
+    attempts = []
+    50.times do
+      attempts << @duck.catches?(@runner)
+    end
+    refute_includes attempts, false
+  end
+
+  def test_never_catches_runner_when_runner_speed_is_eight
+    @runner.stub :run, 8 do
+      attempts = []
+      50.times do
+        attempts << @duck.catches?(@runner)
+      end
+      refute_includes attempts, true
+    end
+  end
+
+  def test_duck_notifies_obtainable_of_ownership_when_obtained
+    duck_name = @duck.name
+    @obtainable_stub.expect :owned_by, nil, [duck_name]
+    @duck.obtain(@obtainable_stub)
+    @obtainable_stub.verify
   end
 end
 
