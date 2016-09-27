@@ -391,19 +391,23 @@ module KnowsRound
   attr_accessor :current_round
   @current_round = 0
 
+  def self.current_round
+    @current_round
+  end
+
   class Garage
     attr_reader :repair_shop
 
-    def initialize
-      @repair_shop = {}
+    def initialize(args={})
+      @repair_shop = args[:repair_shop] || {}
     end
 
     public
     def repair(obtainable)
       # set the value of the obtainable in the repair_shop to the round repairs started
-      puts "Repairing the #{obtainable.name}, should be ready again on round #{obtainable.repair_time + KnowsRound.current_round + 1}"
+      puts "Repairing the #{name_of(obtainable)}, should be ready again on round #{obtainable.repair_time + KnowsRound.current_round + 1}"
       puts
-      repair_shop[obtainable.name] = KnowsRound.current_round
+      send_for_repairs(obtainable)
     end
 
     def repairing?(obtainable)
@@ -421,6 +425,10 @@ module KnowsRound
 
     def name_of(obtainable)
       obtainable.name
+    end
+
+    def send_for_repairs(obtainable)
+      repair_shop[name_of(obtainable)] = KnowsRound.current_round
     end
   end
 end

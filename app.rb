@@ -4,6 +4,7 @@ require 'io/console'
 require './lib/core'
 require './lib/helpers'
 require './lib/config'
+include KnowsRound
 
 player_classes = [Duck, Dog, Cat]
 
@@ -52,7 +53,6 @@ circle.each { |p| p.position = circle.find_index(p) }
 # get a random player to be the first runner
 selected_player = circle.sample   # this also will hold the Chaser object while that player is the runner
 game_on = true
-include KnowsRound
 KnowsRound.current_round = 1
 failures = 0
 

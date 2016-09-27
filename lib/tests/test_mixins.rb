@@ -103,18 +103,27 @@ module ObtainerInterfaceTest
 end
 
 
+class ObtainableStub
+  def name
+    'name'
+  end
+
+  def owned_by(name)
+    nil
+  end
+
+  def obtainable?
+    true
+  end
+
+  def repair_time
+    1
+  end
+end
+
+
 module ObtainerTest
   include ObtainerInterfaceTest
-
-  class ObtainableStub
-    def owned_by(name)
-      nil
-    end
-
-    def obtainable?
-      true
-    end
-  end
 
   def test_notifies_obtainable_of_ownership_when_obtained
     obtainable_mock = MiniTest::Mock.new

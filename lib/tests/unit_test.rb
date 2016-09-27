@@ -298,4 +298,16 @@ class CatTest < MiniTest::Test
 end
 
 
-# GarageTest
+class GarageTest < MiniTest::Test
+  include KnowsRound
+
+  def setup
+    @garage = KnowsRound::Garage.new
+    @obtainable_stub = ObtainableStub.new    
+  end
+
+  def test_repair_sends_obtainable_to_repair_shop_on_current_round
+    @garage.repair(@obtainable_stub)
+    assert_equal KnowsRound.current_round, @garage.repair_shop[@obtainable_stub.name] 
+  end
+end

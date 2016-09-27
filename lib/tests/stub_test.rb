@@ -14,10 +14,8 @@ class ObtainableStubTest < MiniTest::Test
   include ObtainableInterfaceTest
 
   def setup
-    @obrainable_stub = @object = ObtainerTest::ObtainableStub.new
+    @obtainable_stub = @object = ObtainableStub.new
   end
 end
 
-#class RepairerStubTest < MiniTest::Test
 
-#end
