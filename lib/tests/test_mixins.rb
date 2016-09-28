@@ -1,3 +1,5 @@
+require './stubs.rb'
+
 module ObtainableInterfaceTest
   def test_implements_the_obtainable_method
     assert_respond_to @object, :obtainable?
@@ -5,17 +7,6 @@ module ObtainableInterfaceTest
 
   def test_implements_the_owned_by_method
     assert_respond_to @object, :owned_by
-  end
-end
-
-
-module ObtainableTest
-  include ObtainableInterfaceTest
-
-  class RepairerStub
-    def repair(obtainable)
-      nil
-    end
   end
 end
 
@@ -35,7 +26,7 @@ module BreakablePartsInterfaceTest
 end
 
 
-module PlayerInterfaceTest
+module PlayerSuperclassInterfaceTest
   def test_implements_the_score_method
     assert_respond_to @object, :score
   end
@@ -47,11 +38,15 @@ module PlayerInterfaceTest
   def test_implements_the_name_method
     assert_respond_to @object, :name
   end
+
+  def test_implements_the_obtain_method
+    assert_respond_to @object, :obtain
+  end
 end
 
 
-module PlayerTest
-  include PlayerInterfaceTest
+module PlayerSuperclassTest
+  include PlayerSuperclassInterfaceTest
 
   def test_score_adds_one_to_points
     @object.score
@@ -65,6 +60,13 @@ module PlayerTest
 end
 
 
+module PlayerSubclassInterfaceTest
+  def test_implements_the_post_initialize_method
+    assert_respond_to @object, :post_initialize
+  end
+end
+
+
 module ChaserInterfaceTest
   def test_implements_the_chaser_interface
     assert_respond_to @object, :catches?
@@ -74,12 +76,6 @@ end
 
 module ChaserTest
   include ChaserInterfaceTest
-
-  class RunnerStub
-    def run
-      1
-    end
-  end
 
   def test_never_catches_runner_when_distracted
     @object.stub :distracted?, true do
@@ -103,25 +99,6 @@ module ObtainerInterfaceTest
 end
 
 
-class ObtainableStub
-  def name
-    'name'
-  end
-
-  def owned_by(name)
-    nil
-  end
-
-  def obtainable?
-    true
-  end
-
-  def repair_time
-    1
-  end
-end
-
-
 module ObtainerTest
   include ObtainerInterfaceTest
 
@@ -138,5 +115,16 @@ module ObtainerTest
   def test_obtain_sets_the_obtainable_instance_var
     @object.obtain(@obtainable_stub)
     assert_same @obtainable_stub, @object.obtainable
+  end
+end
+
+
+module RepairerInterfaceTest
+  def test_implements_the_repair_method
+    assert_respond_to @object, :repair
+  end
+
+  def test_implements_the_repairing_method
+    assert_respond_to @object, :repairing?
   end
 end

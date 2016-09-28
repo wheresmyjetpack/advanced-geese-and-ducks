@@ -2,7 +2,7 @@ require 'forwardable'
 require_relative 'roles'
 
 class Player
-  attr_reader :breed, :obtainable
+  attr_reader :obtainable
   attr_accessor :position, :points
 
   def initialize(args)
@@ -12,6 +12,10 @@ class Player
   end
 
   public
+  def post_initialize(args)
+    nil
+  end
+
   def name
     "#{@name} the #{breed}"
   end
@@ -46,6 +50,10 @@ class Player
     !rideable.obtainable?
   end
 
+  def breed
+    @breed ||= default_breed
+  end
+
   def default_breed
     raise NotImplementedError
   end
@@ -54,7 +62,7 @@ end
 
 class Duck < Player
   include ::Chaser
-  attr_reader :base_speed
+  attr_reader :base_speed, :breed
 
   def post_initialize(args)
     @breed = args[:breed] || default_breed
@@ -79,7 +87,7 @@ end
 
 class Dog < Player
   include ::Chaser
-  attr_reader :base_speed
+  attr_reader :base_speed, :breed
   attr_accessor :toys
 
   def post_initialize(args)
@@ -141,7 +149,7 @@ end
 
 class Cat < Player
   include ::Chaser
-  attr_reader :base_speed
+  attr_reader :base_speed, :breed
 
   def post_initialize(args)
     @breed = args[:breed] || default_breed
@@ -388,11 +396,14 @@ end
 
 
 module KnowsRound
-  attr_accessor :current_round
   @current_round = 0
 
   def self.current_round
     @current_round
+  end
+
+  def self.current_round=(int)
+    @current_round = int
   end
 
   class Garage

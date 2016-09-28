@@ -4,7 +4,6 @@ require 'io/console'
 require './lib/core'
 require './lib/helpers'
 require './lib/config'
-include KnowsRound
 
 player_classes = [Duck, Dog, Cat]
 

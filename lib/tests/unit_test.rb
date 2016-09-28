@@ -51,7 +51,7 @@ class PartsTest < MiniTest::Test
 
   def test_fix_empties_the_broken_parts_array
     @part.stub :broken?, true do
-      @parts.broken_parts?
+      @parts.broken_parts?  # populates the broken_parts array with any broken parts
       assert_empty @parts.fix
     end
   end
@@ -63,11 +63,11 @@ end
 
 
 class BicycleTest < MiniTest::Test
-  include ObtainableTest
+  include ObtainableInterfaceTest
   include BreakablePartsInterfaceTest
 
   def setup
-    @repairer = RepairerStub.new
+    @repairer = KnowsRound::Garage.new
     @parts = Parts.new([])
     @bicycle = @object = Bicycle.new(parts: @parts, repairer: @repairer)
   end
@@ -106,11 +106,11 @@ end
 
 
 class RollerbladesTest < MiniTest::Test
-  include ObtainableTest
+  include ObtainableInterfaceTest
   include BreakablePartsInterfaceTest
 
   def setup
-    @repairer = RepairerStub.new
+    @repairer = KnowsRound::Garage.new
     @parts = Parts.new([])
     @rollerblades = @object = Rollerblades.new(parts: @parts, repairer: @repairer)
   end
@@ -150,11 +150,11 @@ end
 
 
 class SkateboardTest < MiniTest::Test
-  include ObtainableTest
+  include ObtainableInterfaceTest
   include BreakablePartsInterfaceTest
 
   def setup
-    @repairer = RepairerStub.new
+    @repairer = KnowsRound::Garage.new
     @parts = Parts.new([])
     @skateboard = @object = Skateboard.new(parts: @parts, repairer: @repairer)
   end
@@ -193,8 +193,22 @@ class SkateboardTest < MiniTest::Test
 end
 
 
+class PlayerTest < MiniTest::Test
+  include PlayerSuperclassTest
+
+  def setup
+    @player = @object = Player.new(name: 'name')
+  end
+
+  def test_forces_subclasses_to_implement_default_breed
+    # testing the public method "name", which sends default_breed to self
+    assert_raises(NotImplementedError) { @player.name }
+  end
+end
+
 class DuckTest < MiniTest::Test
-  include PlayerTest
+  include PlayerSuperclassTest
+  include PlayerSubclassInterfaceTest
   include ChaserTest
   include ObtainerTest
 
@@ -225,7 +239,8 @@ end
 
 
 class DogTest < MiniTest::Test
-  include PlayerTest
+  include PlayerSuperclassTest
+  include PlayerSubclassInterfaceTest
   include ChaserTest
   include ObtainerTest
 
@@ -262,7 +277,8 @@ end
 
 
 class CatTest < MiniTest::Test
-  include PlayerTest
+  include PlayerSuperclassTest
+  include PlayerSubclassInterfaceTest
   include ChaserTest
   include ObtainerTest
 
@@ -299,15 +315,35 @@ end
 
 
 class GarageTest < MiniTest::Test
+  include RepairerInterfaceTest
   include KnowsRound
 
   def setup
-    @garage = KnowsRound::Garage.new
+    KnowsRound.current_round = 1
+    @garage = @object = KnowsRound::Garage.new
     @obtainable_stub = ObtainableStub.new    
   end
 
   def test_repair_sends_obtainable_to_repair_shop_on_current_round
     @garage.repair(@obtainable_stub)
     assert_equal KnowsRound.current_round, @garage.repair_shop[@obtainable_stub.name] 
+  end
+
+  def test_repairing_is_true_if_repairs_not_finished
+    @obtainable_stub.stub :repair_time, 10 do
+      @garage.repair(@obtainable_stub)
+      assert_equal true, @garage.repairing?(@obtainable_stub)
+    end
+  end
+
+  def test_repairing_is_false_when_repairs_are_finished
+    @obtainable_stub.stub :repair_time, -1 do
+      @garage.repair(@obtainable_stub)
+      assert_equal false, @garage.repairing?(@obtainable_stub)
+    end
+  end
+
+  def test_repairing_is_false_when_no_obtainable_being_repaired
+    assert_equal false, @garage.repairing?(@obtainable_stub)
   end
 end
