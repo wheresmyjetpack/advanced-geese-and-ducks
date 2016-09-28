@@ -396,7 +396,7 @@ end
 
 
 module KnowsRound
-  @current_round = 0
+  @current_round = 1
 
   def self.current_round
     @current_round
@@ -416,22 +416,34 @@ module KnowsRound
     public
     def repair(obtainable)
       # set the value of the obtainable in the repair_shop to the round repairs started
-      puts "Repairing the #{name_of(obtainable)}, should be ready again on round #{obtainable.repair_time + KnowsRound.current_round + 1}"
-      puts
       send_for_repairs(obtainable)
+      notify_repairing(obtainable)
+      puts
     end
 
     def repairing?(obtainable)
-      still_repairing = (started_repairing(obtainable) + obtainable.repair_time) >= KnowsRound.current_round
+      still_repairing = ready_after_round(obtainable) >= the_current_round
       unless still_repairing
-        obtainable.fixed
+        finish_repairs_on(obtainable)
       end
       still_repairing
     end
 
     private
+    def the_current_round
+      KnowsRound.current_round
+    end
+
+    def ready_after_round(obtainable)
+      started_repairing(obtainable) + repair_time(obtainable)
+    end
+
+    def repair_time(obtainable)
+      obtainable.repair_time
+    end
+
     def started_repairing(obtainable)
-      repair_shop[name_of(obtainable)] || 0 - obtainable.repair_time
+      repair_shop[name_of(obtainable)] || 0 - repair_time(obtainable)
     end
 
     def name_of(obtainable)
@@ -439,7 +451,16 @@ module KnowsRound
     end
 
     def send_for_repairs(obtainable)
-      repair_shop[name_of(obtainable)] = KnowsRound.current_round
+      repair_shop[name_of(obtainable)] = the_current_round
+    end
+
+    def finish_repairs_on(obtainable)
+      obtainable.fixed
+    end
+
+    def notify_repairing(obtainable)
+      puts "Repairing the #{name_of(obtainable)}, should be ready again on round #{ready_after_round(obtainable) + 1}"
+      puts
     end
   end
 end

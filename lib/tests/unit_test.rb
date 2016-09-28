@@ -194,7 +194,7 @@ end
 
 
 class PlayerTest < MiniTest::Test
-  include PlayerSuperclassTest
+  include PlayerInterfaceTest
 
   def setup
     @player = @object = Player.new(name: 'name')
@@ -204,10 +204,21 @@ class PlayerTest < MiniTest::Test
     # testing the public method "name", which sends default_breed to self
     assert_raises(NotImplementedError) { @player.name }
   end
+
+  def test_score_adds_one_to_points
+    @object.score
+    assert_equal 1, @object.points
+  end
+
+  def test_lose_point_subtracts_one_point
+    @object.lose_point
+    assert_equal -1, @object.points
+  end
 end
 
+
 class DuckTest < MiniTest::Test
-  include PlayerSuperclassTest
+  include PlayerInterfaceTest
   include PlayerSubclassInterfaceTest
   include ChaserTest
   include ObtainerTest
@@ -239,7 +250,7 @@ end
 
 
 class DogTest < MiniTest::Test
-  include PlayerSuperclassTest
+  include PlayerInterfaceTest
   include PlayerSubclassInterfaceTest
   include ChaserTest
   include ObtainerTest
@@ -277,7 +288,7 @@ end
 
 
 class CatTest < MiniTest::Test
-  include PlayerSuperclassTest
+  include PlayerInterfaceTest
   include PlayerSubclassInterfaceTest
   include ChaserTest
   include ObtainerTest
@@ -314,12 +325,35 @@ class CatTest < MiniTest::Test
 end
 
 
-class GarageTest < MiniTest::Test
-  include RepairerInterfaceTest
-  include KnowsRound
+class GooseTest < MiniTest::Test
+  include RunnerInterfaceTest
 
   def setup
-    KnowsRound.current_round = 1
+    @goose = @object = Goose.new(name: 'honk')
+  end
+
+  def test_run_returns_at_least_5
+    runs = []
+    50.times do
+      runs << (@goose.run >= 5)
+    end
+    refute_includes runs, false
+  end
+
+  def test_run_returns_no_more_than_8
+    runs = []
+    50.times do
+      runs << (@goose.run <= 8)
+    end
+    refute_includes runs, false
+  end
+end
+
+
+class GarageTest < MiniTest::Test
+  include RepairerInterfaceTest
+
+  def setup
     @garage = @object = KnowsRound::Garage.new
     @obtainable_stub = ObtainableStub.new    
   end

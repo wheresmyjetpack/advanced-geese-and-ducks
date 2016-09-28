@@ -26,7 +26,7 @@ module BreakablePartsInterfaceTest
 end
 
 
-module PlayerSuperclassInterfaceTest
+module PlayerInterfaceTest
   def test_implements_the_score_method
     assert_respond_to @object, :score
   end
@@ -41,21 +41,6 @@ module PlayerSuperclassInterfaceTest
 
   def test_implements_the_obtain_method
     assert_respond_to @object, :obtain
-  end
-end
-
-
-module PlayerSuperclassTest
-  include PlayerSuperclassInterfaceTest
-
-  def test_score_adds_one_to_points
-    @object.score
-    assert_equal 1, @object.points
-  end
-
-  def test_lose_point_subtracts_one_point
-    @object.lose_point
-    assert_equal -1, @object.points
   end
 end
 
