@@ -3,6 +3,15 @@ require 'minitest/autorun'
 require "#{tests_dir}/test_mixins"
 require "#{tests_dir}/stubs"
 
+class PlayerStubTest < MiniTest::Test
+  include PlayerInterfaceTest
+
+  def setup
+    @player_stub = @object = PlayerStub.new(name: 'name')
+  end
+end
+
+
 class RunnerStubTest < MiniTest::Test
   include RunnerInterfaceTest
 
