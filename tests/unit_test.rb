@@ -1,4 +1,4 @@
-require '../core'
+require '../lib/core'
 require './test_mixins'
 require 'minitest/autorun'
 require 'minitest/mock'
