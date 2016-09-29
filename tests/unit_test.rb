@@ -214,6 +214,13 @@ class ItemMetaDataTest < MiniTest::Test
       assert_equal 0, @item_meta_data.item_bonus
     end
   end
+
+  def test_sets_the_item_owner_when_initialized
+    item_mock = MiniTest::Mock.new
+    item_mock.expect :owned_by, nil, ['owner']
+    ItemMetaData.new(item: item_mock, owner: 'owner')
+    item_mock.verify
+  end
 end
 
 
@@ -238,16 +245,6 @@ class PlayerTest < MiniTest::Test
   def test_lose_point_subtracts_one_point
     @object.lose_point
     assert_equal -1, @object.points
-  end
-
-  def test_notifies_obtainable_of_ownership_when_obtained
-    obtainable_mock = MiniTest::Mock.new
-    def obtainable_mock.obtainable?
-      true
-    end
-    obtainable_mock.expect :owned_by, nil, [@object.name]
-    @object.obtain(obtainable_mock)
-    obtainable_mock.verify
   end
 
   def test_obtain_sets_the_obtainable_instance_var
