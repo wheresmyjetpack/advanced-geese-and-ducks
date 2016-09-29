@@ -366,17 +366,14 @@ class GarageTest < MiniTest::Test
   end
 
   def test_repairing_is_true_if_repairs_not_finished
-    @obtainable_stub.stub :repair_time, 10 do
-      @garage.repair(@obtainable_stub)
-      assert_equal true, @garage.repairing?(@obtainable_stub)
-    end
+    @garage.repair(@obtainable_stub)
+    assert_equal true, @garage.repairing?(@obtainable_stub)
   end
 
   def test_repairing_is_false_when_repairs_are_finished
-    @obtainable_stub.stub :repair_time, -1 do
-      @garage.repair(@obtainable_stub)
-      assert_equal false, @garage.repairing?(@obtainable_stub)
-    end
+    @garage.repair(@obtainable_stub)
+    KnowsRound.current_round = 3  # advance to when the obtainable should be ready
+    assert_equal false, @garage.repairing?(@obtainable_stub)
   end
 
   def test_repairing_is_false_when_no_obtainable_being_repaired
