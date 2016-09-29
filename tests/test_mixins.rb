@@ -1,4 +1,5 @@
-require './stubs.rb'
+tests_dir = File.dirname(File.expand_path(".", __FILE__))
+require "#{tests_dir}/stubs.rb"
 
 module ObtainableInterfaceTest
   def test_implements_the_obtainable_method

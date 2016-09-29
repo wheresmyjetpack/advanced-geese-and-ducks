@@ -1,6 +1,7 @@
+tests_dir = File.dirname(File.expand_path(".", __FILE__))
 require 'minitest/autorun'
-require './test_mixins'
-require './stubs'
+require "#{tests_dir}/test_mixins"
+require "#{tests_dir}/stubs"
 
 class RunnerStubTest < MiniTest::Test
   include RunnerInterfaceTest

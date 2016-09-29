@@ -1,5 +1,7 @@
-require '../lib/core'
-require './test_mixins'
+project_dir = File.dirname(File.expand_path("..", __FILE__))
+tests_dir = File.dirname(File.expand_path(".", __FILE__))
+require "#{project_dir}/lib/core"
+require "#{tests_dir}/test_mixins"
 require 'minitest/autorun'
 require 'minitest/mock'
 
