@@ -1,3 +1,12 @@
+project_dir = File.dirname(File.expand_path("..", __FILE__))
+require "#{project_dir}/lib/core"
+
+class PlayerStub < Player
+  def default_breed
+    'viola'
+  end
+end
+
 class RepairerStub
   def repair(obtainable)
     nil

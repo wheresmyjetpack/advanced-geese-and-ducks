@@ -6,7 +6,7 @@ module ObtainableInterfaceTest
     assert_respond_to @object, :obtainable?
   end
 
-  def test_implements_the_owned_by_method
+  def test_immplements_the_owned_by_method
     assert_respond_to @object, :owned_by
   end
 end
@@ -43,6 +43,10 @@ module PlayerInterfaceTest
   def test_implements_the_obtain_method
     assert_respond_to @object, :obtain
   end
+
+  def test_implements_the_obtain_method
+    assert_respond_to @object, :obtain
+  end
 end
 
 
@@ -74,33 +78,6 @@ end
 module RunnerInterfaceTest
   def test_implements_the_run_method
     assert_respond_to @object, :run
-  end
-end
-
-
-module ObtainerInterfaceTest
-  def test_implements_the_obtain_method
-    assert_respond_to @object, :obtain
-  end
-end
-
-
-module ObtainerTest
-  include ObtainerInterfaceTest
-
-  def test_notifies_obtainable_of_ownership_when_obtained
-    obtainable_mock = MiniTest::Mock.new
-    def obtainable_mock.obtainable?
-      true
-    end
-    obtainable_mock.expect :owned_by, nil, [@object.name]
-    @object.obtain(obtainable_mock)
-    obtainable_mock.verify
-  end
-
-  def test_obtain_sets_the_obtainable_instance_var
-    @object.obtain(@obtainable_stub)
-    assert_same @obtainable_stub, @object.obtainable
   end
 end
 

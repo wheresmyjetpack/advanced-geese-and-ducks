@@ -29,25 +29,16 @@ class Player
   end
 
   def obtain(item)
-    @obtainable = item
-    obtained_by(name)
+    self.obtainable = item
   end
 
   private
+  def obtainable=(obj)
+    @obtainable = ItemDescriptor.new(item: obj, owner: name)
+  end
+
   def obtainable_speed
-    unless @obtainable.nil? || unrideable?(@obtainable)
-      @obtainable.speed
-    else
-      0
-    end
-  end
-
-  def obtained_by(name)
-    @obtainable.owned_by(name)
-  end
-
-  def unrideable?(rideable)
-    !rideable.obtainable?
+    @obtainable.nil? ? 0 : @obtainable.item_bonus
   end
 
   def breed
@@ -56,6 +47,29 @@ class Player
 
   def default_breed
     raise NotImplementedError
+  end
+end
+
+
+class ItemDescriptor
+  attr_reader :item
+
+  def initialize(args)
+    @item = args[:item]
+    @item.owned_by(args[:owner])
+  end
+
+  def item_bonus
+    unless unrideable?
+      item.speed
+    else
+      0
+    end
+  end
+
+  private
+  def unrideable?
+    !item.obtainable?
   end
 end
 
@@ -72,11 +86,7 @@ class Duck < Player
 
   private
   def determine_speed
-    base_speed + rand(-1..5) + bonus_speed
-  end
-
-  def bonus_speed
-    obtainable_speed
+    base_speed + rand(-1..5) + obtainable_speed
   end
 
   def default_breed

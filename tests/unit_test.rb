@@ -199,7 +199,8 @@ class PlayerTest < MiniTest::Test
   include PlayerInterfaceTest
 
   def setup
-    @player = @object = Player.new(name: 'name')
+    @player = Player.new(name: 'name')
+    @stubbed_player = @object = PlayerStub.new(name: 'name')
   end
 
   def test_forces_subclasses_to_implement_default_breed
@@ -216,6 +217,22 @@ class PlayerTest < MiniTest::Test
     @object.lose_point
     assert_equal -1, @object.points
   end
+
+  def test_notifies_obtainable_of_ownership_when_obtained
+    obtainable_mock = MiniTest::Mock.new
+    def obtainable_mock.obtainable?
+      true
+    end
+    obtainable_mock.expect :owned_by, nil, [@object.name]
+    @object.obtain(obtainable_mock)
+    obtainable_mock.verify
+  end
+
+  def test_obtain_sets_the_obtainable_instance_var
+    obtainable_stub = ObtainableStub.new
+    @object.obtain(obtainable_stub)
+    assert_same obtainable_stub, @object.obtainable.item
+  end
 end
 
 
@@ -223,7 +240,6 @@ class DuckTest < MiniTest::Test
   include PlayerInterfaceTest
   include PlayerSubclassInterfaceTest
   include ChaserTest
-  include ObtainerTest
 
   def setup
     @runner_stub = RunnerStub.new
@@ -255,7 +271,6 @@ class DogTest < MiniTest::Test
   include PlayerInterfaceTest
   include PlayerSubclassInterfaceTest
   include ChaserTest
-  include ObtainerTest
 
   def setup
     @runner_stub = RunnerStub.new
@@ -293,7 +308,6 @@ class CatTest < MiniTest::Test
   include PlayerInterfaceTest
   include PlayerSubclassInterfaceTest
   include ChaserTest
-  include ObtainerTest
 
   def setup
     @runner_stub = RunnerStub.new
