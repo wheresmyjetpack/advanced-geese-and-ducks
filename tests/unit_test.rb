@@ -11,7 +11,7 @@ class PartTest < MiniTest::Test
     @part = Part.new(name: 'name', description: 'description', speed_boost: 1, break_chance: 0.0)
   end
 
-  def test_implements_the_breakable_interface
+  def test_implements_the_broken_method
     assert_respond_to @part, :broken?
   end
 
@@ -20,9 +20,8 @@ class PartTest < MiniTest::Test
   end
 
   def test_breaks_with_100_precent_break_chance
-    @part.stub :break_chance, 1.0 do
-      assert_equal true, @part.broken?
-    end
+    part = Part.new(name: 'name', description: 'description', speed_boost: 1, break_chance: 1.0)
+    assert_equal true, part.broken?
   end
 end
 
@@ -69,9 +68,8 @@ class BicycleTest < MiniTest::Test
   include BreakablePartsInterfaceTest
 
   def setup
-    @repairer = KnowsRound::Garage.new
     @parts = Parts.new([])
-    @bicycle = @object = Bicycle.new(parts: @parts, repairer: @repairer)
+    @bicycle = @object = Bicycle.new(parts: @parts)
   end
 
   def test_broken_parts_decrease_speed
@@ -112,9 +110,8 @@ class RollerbladesTest < MiniTest::Test
   include BreakablePartsInterfaceTest
 
   def setup
-    @repairer = KnowsRound::Garage.new
     @parts = Parts.new([])
-    @rollerblades = @object = Rollerblades.new(parts: @parts, repairer: @repairer)
+    @rollerblades = @object = Rollerblades.new(parts: @parts)
   end
 
   def test_broken_parts_decrease_speed
@@ -124,7 +121,7 @@ class RollerbladesTest < MiniTest::Test
   end
 
   def test_calculates_speed
-    @rollerblades.stub :parts_quality, 3 do
+    @parts.stub :quality, 3 do
       assert_equal 3, @rollerblades.speed
     end
   end
@@ -156,9 +153,8 @@ class SkateboardTest < MiniTest::Test
   include BreakablePartsInterfaceTest
 
   def setup
-    @repairer = KnowsRound::Garage.new
     @parts = Parts.new([])
-    @skateboard = @object = Skateboard.new(parts: @parts, repairer: @repairer)
+    @skateboard = @object = Skateboard.new(parts: @parts)
   end
 
   def test_broken_parts_decrease_speed
@@ -168,7 +164,7 @@ class SkateboardTest < MiniTest::Test
   end
 
   def test_calculates_speed
-    @skateboard.stub :parts_quality, 3 do
+    @parts.stub :quality, 3 do
       assert_equal 4, @skateboard.speed
     end
   end
@@ -285,6 +281,18 @@ class DuckTest < MiniTest::Test
       refute_includes attempts, true
     end
   end
+
+  def test_calculates_speed_increase_from_obtainable
+    @duck.obtain(@obtainable_stub)
+    # Duck will always catch a runner with speed of 2 when Duck has an obtainable_speed of 1
+    @runner_stub.stub :run, 2 do
+      attempts = []
+      50.times do
+        attempts << @duck.catches?(@runner_stub)
+      end
+      refute_includes attempts, false
+    end
+  end
 end
 
 
@@ -316,12 +324,25 @@ class DogTest < MiniTest::Test
     # Dogs can't catch runner when runner speed is 6
     @runner.stub :run, 6 do
       attempts = []
-      @dog.stub :bonus_speed, 0 do
-        50.times do
-          attempts << @dog.catches?(@runner)
-        end
+      50.times do
+        @dog.toys = 0  # prevent Dog from ever gaining bonuses to speed
+        attempts << @dog.catches?(@runner)
       end
       refute_includes attempts, true
+    end
+  end
+
+  def test_calculates_bonus_speed
+    # Dog will always catch a runner with speed 4 when Dog gains the bonus from having enough toys
+    @runner.stub :run, 4 do
+      attempts = []
+      @dog.stub :distracted?, false do
+        50.times do
+          @dog.toys = 3
+          attempts << @dog.catches?(@runner)
+        end
+        refute_includes attempts, false
+      end
     end
   end
 end
@@ -355,12 +376,25 @@ class CatTest < MiniTest::Test
     # Cats can't catch runner when runner speed is 8
     @runner.stub :run, 8 do
       attempts = []
-      @cat.stub :bonus_speed, 0 do
-        50.times do
-          attempts << @cat.catches?(@runner)
-        end
+      50.times do
+        @cat.catnip = false  # prevent Cat from ever gaining bonuses to speed
+        attempts << @cat.catches?(@runner)
       end
       refute_includes attempts, true
+    end
+  end
+
+  def test_calculates_bonus_speed
+    # Cat will always catch a runner with speed 6 when Cat benefits from its bonus speed
+    @runner.stub :run, 6 do
+      attempts = []
+      @cat.stub :distracted?, false do
+        50.times do
+          @cat.catnip = true
+          attempts << @cat.catches?(@runner)
+        end
+        refute_includes attempts, false
+      end
     end
   end
 end
@@ -376,6 +410,7 @@ class GooseTest < MiniTest::Test
   def test_doesnt_run_too_slow
     runs = []
     50.times do
+      # Goose always runs at least 5
       runs << (@goose.run >= 5)
     end
     refute_includes runs, false
@@ -384,6 +419,7 @@ class GooseTest < MiniTest::Test
   def test_doesnt_run_too_fast
     runs = []
     50.times do
+      # Goose never runs faster than 8
       runs << (@goose.run <= 8)
     end
     refute_includes runs, false

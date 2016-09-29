@@ -160,6 +160,7 @@ end
 class Cat < Player
   include ::Chaser
   attr_reader :base_speed, :breed
+  attr_accessor :catnip
 
   def post_initialize(args)
     @breed = args[:breed] || default_breed
@@ -228,7 +229,7 @@ class Bicycle
   attr_accessor :owner
 
   def initialize(args)
-    @repairer = args[:repairer]
+    @repairer = args[:repairer] || nil
     @parts = args[:parts]
     @owner = nil
   end
