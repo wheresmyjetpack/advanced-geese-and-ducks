@@ -48,6 +48,10 @@ module Obtainable
     @owner = name
   end
 
+  def speed
+    nil
+  end
+
   private
   def repair
     local_notify_repairs

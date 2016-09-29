@@ -9,6 +9,10 @@ module ObtainableInterfaceTest
   def test_immplements_the_owned_by_method
     assert_respond_to @object, :owned_by
   end
+
+  def test_implements_the_speed_method
+    assert_respond_to @object, :speed
+  end
 end
 
 

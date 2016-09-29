@@ -30,6 +30,10 @@ class ObtainableStub
     'name'
   end
 
+  def speed
+    1
+  end
+
   def owned_by(name)
     nil
   end

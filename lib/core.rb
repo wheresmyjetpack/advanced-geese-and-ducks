@@ -34,7 +34,7 @@ class Player
 
   private
   def obtainable=(obj)
-    @obtainable = ItemDescriptor.new(item: obj, owner: name)
+    @obtainable = ItemMetaData.new(item: obj, owner: name)
   end
 
   def obtainable_speed
@@ -51,7 +51,7 @@ class Player
 end
 
 
-class ItemDescriptor
+class ItemMetaData
   attr_reader :item
 
   def initialize(args)
