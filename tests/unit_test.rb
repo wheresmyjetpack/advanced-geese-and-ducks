@@ -228,8 +228,7 @@ class PlayerTest < MiniTest::Test
   include PlayerInterfaceTest
 
   def setup
-    @player = Player.new(name: 'name')
-    @stubbed_player = @object = PlayerStub.new(name: 'name')
+    @player = @object = Player.new(name: 'name')
   end
 
   def test_forces_subclasses_to_implement_default_breed
@@ -238,19 +237,20 @@ class PlayerTest < MiniTest::Test
   end
 
   def test_score_adds_one_to_points
-    @object.score
-    assert_equal 1, @object.points
+    @player.score
+    assert_equal 1, @player.points
   end
 
   def test_lose_point_subtracts_one_point
-    @object.lose_point
-    assert_equal -1, @object.points
+    @player.lose_point
+    assert_equal -1, @player.points
   end
 
   def test_obtain_sets_the_obtainable_instance_var
+    stubbed_player = PlayerStub.new(name: 'name')  # inherits from Player, implements default_breed
     obtainable_stub = ObtainableStub.new
-    @object.obtain(obtainable_stub)
-    refute_nil @object.obtainable
+    stubbed_player.obtain(obtainable_stub)  # send to the stubbed_player because default_breed is called
+    refute_nil stubbed_player.obtainable
   end
 end
 
@@ -267,6 +267,7 @@ class DuckTest < MiniTest::Test
   end
 
   def test_catches_slow_runner
+    # Ducks catch runners when runner speed is 1
     attempts = []
     50.times do
       attempts << @duck.catches?(@runner_stub)
@@ -275,6 +276,7 @@ class DuckTest < MiniTest::Test
   end
 
   def test_cant_catch_fast_runner
+    # Ducks can't catch runners when speed is 8
     @runner_stub.stub :run, 8 do
       attempts = []
       50.times do
@@ -298,6 +300,7 @@ class DogTest < MiniTest::Test
   end
 
   def test_catches_slow_runner_when_not_distracted
+    # Dogs catch runners when runner speed is 3
     @runner.stub :run, 3 do
       attempts = []
       @dog.stub :distracted?, false do
@@ -310,6 +313,7 @@ class DogTest < MiniTest::Test
   end
 
   def test_cant_catch_fast_runner
+    # Dogs can't catch runner when runner speed is 6
     @runner.stub :run, 6 do
       attempts = []
       @dog.stub :bonus_speed, 0 do
@@ -335,6 +339,7 @@ class CatTest < MiniTest::Test
   end
 
   def test_catches_slow_runner_when_not_distracted
+    # Cats catch runners when runner speed is 4
     @runner.stub :run, 4 do
       attempts = []
       @cat.stub :distracted?, false do
@@ -347,6 +352,7 @@ class CatTest < MiniTest::Test
   end
 
   def test_cant_catch_fast_runner
+    # Cats can't catch runner when runner speed is 8
     @runner.stub :run, 8 do
       attempts = []
       @cat.stub :bonus_speed, 0 do
