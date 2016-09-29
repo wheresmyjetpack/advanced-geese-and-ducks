@@ -13,7 +13,7 @@ class PartTest < MiniTest::Test
     assert_respond_to @part, :broken?
   end
 
-  def test_doesnt_break_with_0_precent_break_chance
+  def test_doesnt_break_with_0_percent_break_chance
     assert_equal false, @part.broken?
   end
 
